@@ -1,7 +1,40 @@
-﻿namespace EventPlatform.Data
-{
-    public class Context 
-    {
+﻿using EventPlatform.Domen;
+using Microsoft.EntityFrameworkCore;
 
+namespace EventPlatform.Data
+{
+    public class Context : DbContext
+    {
+        public Context(DbContextOptions<Context> options) : base(options)
+        {
+        }
+        public DbSet<StrucniDogadjaj> StrucniDogadjaji { get; set; }
+        public DbSet<TipDogadjaja> TipoviDogadjaja { get; set; }
+        public DbSet<Predavac> Predavaci { get; set; }
+        public DbSet<Lokacija> Lokacije { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<StrucniDogadjaj>()
+                .HasOne(sd => sd.Lokacija)
+                .WithMany(l => l.StrucniDogadjaji)
+                .HasForeignKey(sd => sd.LokacijaID);
+
+            modelBuilder.Entity<StrucniDogadjaj>()
+                .HasMany(sd => sd.Predavaci)
+                .WithMany(p => p.StrucniDogadjaji)
+                .UsingEntity<Dictionary<string, object>>(
+                    "StrucniDogadjajiPredavaci",
+                    t => t.HasOne<Predavac>().WithMany().HasForeignKey("PredavacID"),
+                    t => t.HasOne<StrucniDogadjaj>().WithMany().HasForeignKey("StrucniDogadjajID")
+                );
+            modelBuilder.Entity<StrucniDogadjaj>()
+                .HasOne(sd => sd.TipDogadjaja)
+                .WithMany(tip => tip.StrucniDogadjaji)
+                .HasForeignKey(sd => sd.TipDogadjajaID);
+
+        }
     }
 }
