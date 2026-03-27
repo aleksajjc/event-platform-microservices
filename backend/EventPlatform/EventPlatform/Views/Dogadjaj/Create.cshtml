@@ -1,0 +1,59 @@
+@using EventPlatform.Models.Dogadjaji
+@model DogadjajCreateViewModel
+
+<h1>Create event</h1>
+
+<form asp-action="Create">
+	<div class="mb-3">
+		<label for="Naziv" class="form-label"> Naziv </label>
+		<input type="text" class="form-control" asp-for="Naziv"/>
+	</div>
+
+	<div class="mb-3">
+		<label for="Agenda" class="form-label"> Agenda</label>
+		<input type="text" class="form-control" asp-for="Agenda"/>
+	</div>
+
+	<div class="mb-3">
+		<label for="DatumVremeOdrzavanja" class="form-label">Datum i vreme odrzavanja dogadjaja</label>
+		<input type="datetime-local" class="form-control" asp-for="DatumVremeOdrzavanja"/>
+	</div>
+
+	<div class="mb-3">
+		<label for="Trajanje" class="form-label">Trajanje dogadjaja</label>
+		<div class="input-group">
+			<input type="number" class="form-control" asp-for="Trajanje" />
+			<span class="input-group-text">h</span>                      
+		</div>                                                           
+	</div>
+
+	<div class="mb-3">
+		<label for="CenaKotizacije" class="form-label">Cena kotizacije</label>
+		<div class="input-group">
+			<input type="number" class="form-control" asp-for="CenaKotizacije" />
+			<span class="input-group-text">RSD</span>                         
+		</div>                                                               
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="LokacijaID" class="form-label">Lokacija</label>
+		<select asp-for="LokacijaID" class="form-control" asp-items="ViewBag.lokacijeList">
+			<option value="">Izaberite lokaciju</option>
+		</select>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="TipDogadjajaID" class="form-label">Tip dogadjaja</label>
+		<select asp-for="TipDogadjajaID" class="form-control" asp-items="ViewBag.tipoviList">
+			<option value="">Izaberite tip dogadjaja</option>
+		</select>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="OdabraniPredavaciID" class="form-label">Odaberite predavače</label>
+		<select asp-for="OdabraniPredavaciID" class="form-control" asp-items="ViewBag.predavaciList" multiple>
+			
+		</select>
+	</div>
+	<button type="submit" class="btn btn-primary"> Create </button>
+</form>

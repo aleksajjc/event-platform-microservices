@@ -1,0 +1,43 @@
+﻿@using EventPlatform.Models.Dogadjaji
+@model List<DogadjajViewModel>
+
+<h1>Dogadjaji</h1>
+
+<a href="@Url.Action("Create","Dogadjaj")" class="btn btn-primary">Kreiraj novi dogadjaj</a>
+<table class="table table-striped table-hover mt-3">
+	<thead>
+		<tr>
+			<th>Naziv</th>
+			<th>Agenda</th>
+			<th>Datum i vreme odrzavanja</th>
+			<th>Trajanje (h)</th>
+			<th>Cena kotizacije (RSD)</th>
+			<th>Lokacija</th>
+			<th>Tip dogadjaja</th>
+			<th>Predavaci</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var item in Model)
+		{
+			<tr>
+				<td>@item.Naziv</td>
+				<td>@item.Agenda</td>
+				<td>@item.DatumVremeOdrzavanja</td>
+				<td>@item.Trajanje</td>
+				<td>@item.CenaKotizacije</td>
+				<td>@item.Lokacija.Naziv <br/>
+					@item.Lokacija.Adresa	
+				</td>
+				<td>@item.TipDogadjaja.NazivTipa</td>
+				<td>
+					@foreach(var p in item.Predavaci)
+					{
+						<span>@p.Ime @p.Prezime</span>
+					}
+				</td
+			</tr>
+		}
+	</tbody>
+
+</table>
