@@ -138,5 +138,21 @@ namespace EventPlatform.Controllers
 
             return RedirectToAction("Index");
         }
+        [HttpPost]
+        public IActionResult Delete(int Id)
+        {
+            var dogadjaj = context.StrucniDogadjaji
+                           .Include(sd => sd.Predavaci)
+                           .FirstOrDefault(sd => sd.StrucniDogadjajID == Id);
+            if(dogadjaj == null)
+            {
+                return NotFound();
+            }
+            dogadjaj.Predavaci.Clear();
+            context.StrucniDogadjaji.Remove(dogadjaj);
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
     }
 }

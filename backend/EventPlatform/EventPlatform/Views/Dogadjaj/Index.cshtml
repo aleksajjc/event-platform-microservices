@@ -38,7 +38,16 @@
 				</td>
 				<td>
 					<a href="@Url.Action("Edit", "Dogadjaj", new { id = item.StrucniDogadjajID })" 
-					 class="btn btn-warning btn-sm">Izmeni</a>
+					 class="btn btn-primary btn-sm">Izmeni</a>
+				</td>
+				<td>
+					<form asp-action="Delete" asp-route-id="@item.StrucniDogadjajID"
+						  method="post" style="display:inline;">
+						<button type="submit" class="btn btn-danger btn-sm"
+								onclick="return confirm('Da li ste sigurni?')">
+							Obriši
+						</button>
+					</form>
 				</td>
 			</tr>
 		}

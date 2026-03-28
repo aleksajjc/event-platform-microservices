@@ -44,6 +44,7 @@ namespace EventPlatform.Controllers
                                 .Include(l => l.StrucniDogadjaji)
                                 .Select(l => new LokacijaViewModel
                                 {
+                                    LokacijaID = l.LokacijaID,
                                     Naziv = l.Naziv,
                                     Adresa = l.Adresa,
                                     Kapacitet = l.Kapacitet,
@@ -55,6 +56,51 @@ namespace EventPlatform.Controllers
                                     }).ToList()
                                 }).ToList();
             return View(listaLokacija);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int Id)
+        {
+            var lokacija = context.Lokacije
+                           .FirstOrDefault(l => l.LokacijaID == Id);
+            if(lokacija == null)
+            {
+                return NotFound();
+            }
+            var model = new LokacijaCreateViewModel
+            {
+                LokacijaID = lokacija.LokacijaID,
+                Naziv = lokacija.Naziv,
+                Adresa = lokacija.Adresa,
+                Kapacitet = lokacija.Kapacitet
+            };
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult Edit(LokacijaCreateViewModel model)
+        {
+            var lokacija = context.Lokacije
+                            .FirstOrDefault(l => l.LokacijaID == model.LokacijaID);
+            if(lokacija == null)
+            {
+                return NotFound();
+            }
+            lokacija.Naziv = model.Naziv;
+            lokacija.Adresa = model.Adresa;
+            lokacija.Kapacitet = model.Kapacitet;
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public IActionResult Delete(int Id)
+        {
+            var lokacija = context.Lokacije
+                            .FirstOrDefault(l => l.LokacijaID == Id);
+
+            context.Lokacije.Remove(lokacija);
+            context.SaveChanges();
+            return RedirectToAction("Index");           
         }
     }
 }

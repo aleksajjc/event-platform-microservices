@@ -1,4 +1,4 @@
-﻿@using EventPlatform.Models.Lokacija
+@using EventPlatform.Models.Lokacija
 @model List<LokacijaViewModel>
 
 <h1>Lokacije</h1>
@@ -27,7 +27,6 @@
 					@foreach (var sd in item.OdabraniStrucniDogadjaji)
 					{
 						<span>@sd.Naziv</span>
-				
 						<br />
 					}
 				</td>
@@ -35,7 +34,6 @@
 					@foreach (var sd in item.OdabraniStrucniDogadjaji)
 					{
 						<span>@sd.DatumVremeOdrzavanja</span>
-				
 						<br />
 					}
 				</td>
@@ -43,8 +41,27 @@
 					@foreach (var sd in item.OdabraniStrucniDogadjaji)
 					{
 						<span>@sd.Trajanje</span>
-				
 						<br />
+					}
+				</td>
+				<td>
+					<a href="@Url.Action("Edit","Lokacija",new {Id = item.LokacijaID}) "
+					 class="btn btn-primary btn-sm">Izmeni</a>
+				</td>
+				<td>
+					@if (item.OdabraniStrucniDogadjaji.Any())
+					{
+						<button class="btn btn-secondary btn-sm" disabled title="Nije moguće obrisati lokaciju sa događajima">
+							Obriši
+						</button>
+					}
+					else
+					{
+						<form asp-action="Delete" asp-route-id="@item.LokacijaID" method="post" style="display:inline;">
+							<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni?')">
+								Obriši
+							</button>
+						</form>
 					}
 				</td>
 			</tr>

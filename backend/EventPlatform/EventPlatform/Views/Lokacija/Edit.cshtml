@@ -1,0 +1,24 @@
+@using EventPlatform.Models.Lokacija
+@model LokacijaCreateViewModel
+
+<h1>Izmeni lokaciju</h1>
+
+<form asp-action="Edit">
+	<input type="hidden" asp-for="LokacijaID"/>
+
+	<div class="mb-3">
+		<label for="Naziv" class="form-label">Naziv</label>
+		<input type="text" class="form-control" asp-for="Naziv"/>
+	</div>
+
+	<div class="mb-3">
+		<label for="Adresa" class="form-label">Adresa</label>
+		<input type="text" class="form-control" asp-for="Adresa" />
+	</div>
+
+	<div class="mb-3">
+		<label for="Kapacitet" class="form-label">Kapacitet</label>
+		<input type="text" class="form-control" asp-for="Kapacitet" />
+	</div>
+	<button type="submit" class="btn btn-primary">Izmeni</button>
+</form>
