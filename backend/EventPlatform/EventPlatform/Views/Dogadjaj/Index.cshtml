@@ -15,6 +15,7 @@
 			<th>Lokacija</th>
 			<th>Tip dogadjaja</th>
 			<th>Predavaci</th>
+			<th>Izmeni</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -35,7 +36,11 @@
 					{
 						<span>@p.Ime @p.Prezime</span>
 					}
-				</td
+				</td>
+				<td>
+					<a href="@Url.Action("Edit", "Dogadjaj", new { id = item.StrucniDogadjajID })" 
+					 class="btn btn-warning btn-sm">Izmeni</a>
+				</td>
 			</tr>
 		}
 	</tbody>

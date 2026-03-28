@@ -67,6 +67,7 @@ namespace EventPlatform.Controllers
                                   .Include(sd => sd.Lokacija)
                                   .Select(d => new DogadjajViewModel
                                   {
+                                      StrucniDogadjajID = d.StrucniDogadjajID,
                                       Naziv = d.Naziv,
                                       Agenda = d.Agenda,
                                       DatumVremeOdrzavanja = d.DatumVremeOdrzavanja,
@@ -80,7 +81,7 @@ namespace EventPlatform.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditGet(int Id)
+        public IActionResult Edit(int Id)
         {
             var odabranDogadjaj = context.StrucniDogadjaji
                                     .Include(sd => sd.Predavaci)
@@ -109,6 +110,33 @@ namespace EventPlatform.Controllers
             ViewBag.predavaciList = new MultiSelectList(predavaci.Select(p => new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
 
             return View(model);
+        }
+        [HttpPost]
+        public IActionResult Edit(DogadjajCreateViewModel model)
+        {
+            var dogadjajAzuriran = context.StrucniDogadjaji
+                            .Include(sd => sd.Predavaci)
+                            .FirstOrDefault(sd => sd.StrucniDogadjajID == model.StrucniDogadjajID);
+            if(dogadjajAzuriran == null)
+            {
+                return NotFound();
+            }
+
+            dogadjajAzuriran.Naziv = model.Naziv;
+            dogadjajAzuriran.Agenda = model.Agenda;
+            dogadjajAzuriran.DatumVremeOdrzavanja = model.DatumVremeOdrzavanja;
+            dogadjajAzuriran.Trajanje = model.Trajanje;
+            dogadjajAzuriran.CenaKotizacije = model.CenaKotizacije;
+            dogadjajAzuriran.LokacijaID = model.LokacijaID;
+            dogadjajAzuriran.TipDogadjajaID = model.TipDogadjajaID;
+
+            dogadjajAzuriran.Predavaci.Clear();
+            dogadjajAzuriran.Predavaci = context.Predavaci
+                                         .Where(p => model.OdabraniPredavaciID.Contains(p.PredavacID))
+                                         .ToList();
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }
