@@ -23,13 +23,15 @@ namespace EventPlatform.Controllers
         public IActionResult Create()  
         {
             var lokacije = context.Lokacije.ToList();
-            ViewBag.lokacijeList = new SelectList(lokacije, "LokacijaID", "Naziv");
+            ViewBag.lokacijeList = new SelectList(lokacije.Select
+            (l => new { l.LokacijaID, Prikaz = l.Naziv + " (Kapacitet: " + l.Kapacitet + ")" }), "LokacijaID", "Prikaz");
 
             var tipovi = context.TipoviDogadjaja.ToList();
             ViewBag.tipoviList = new SelectList(tipovi, "TipDogadjajaID", "NazivTipa");
 
             var predavaci = context.Predavaci.ToList();
-            ViewBag.predavaciList = new SelectList(predavaci, "PredavacID", "Ime");
+            ViewBag.predavaciList = new MultiSelectList(predavaci.Select
+           (p => new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
 
             return View(new DogadjajCreateViewModel());
         }
@@ -57,7 +59,6 @@ namespace EventPlatform.Controllers
             return RedirectToAction("Index");
         }
 
-
         public IActionResult Index()
         {
             var listaDogadjaja = context.StrucniDogadjaji
@@ -76,6 +77,38 @@ namespace EventPlatform.Controllers
                                       Predavaci = d.Predavaci.Select(p => new PredavacViewModel { Ime = p.Ime, Prezime = p.Prezime }).ToList()
                                   }).ToList();
             return View(listaDogadjaja);
+        }
+
+        [HttpGet]
+        public IActionResult EditGet(int Id)
+        {
+            var odabranDogadjaj = context.StrucniDogadjaji
+                                    .Include(sd => sd.Predavaci)
+                                    .FirstOrDefault(sd => sd.StrucniDogadjajID == Id);
+            if(odabranDogadjaj == null)
+            {
+                return NotFound();
+            }
+
+            var model = new DogadjajCreateViewModel
+            {
+                StrucniDogadjajID = odabranDogadjaj.StrucniDogadjajID,
+                Naziv = odabranDogadjaj.Naziv,
+                Agenda = odabranDogadjaj.Agenda,
+                DatumVremeOdrzavanja = odabranDogadjaj.DatumVremeOdrzavanja,
+                Trajanje = odabranDogadjaj.Trajanje,
+                CenaKotizacije = odabranDogadjaj.CenaKotizacije,
+                LokacijaID = odabranDogadjaj.LokacijaID,
+                OdabraniPredavaciID = odabranDogadjaj.Predavaci.Select(p => p.PredavacID).ToList(),
+                TipDogadjajaID = odabranDogadjaj.TipDogadjajaID
+            };
+            var lokacije = context.Lokacije.ToList();
+            ViewBag.lokacijeList = new SelectList(lokacije.Select(l => new { l.LokacijaID, Prikaz = l.Naziv + " (Kapacitet: " + l.Kapacitet + ")" }), "LokacijaID", "Prikaz");
+            ViewBag.tipoviList = new SelectList(context.TipoviDogadjaja.ToList(), "TipDogadjajaID", "NazivTipa");
+            var predavaci = context.Predavaci.ToList();
+            ViewBag.predavaciList = new MultiSelectList(predavaci.Select(p => new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
+
+            return View(model);
         }
     }
 }
