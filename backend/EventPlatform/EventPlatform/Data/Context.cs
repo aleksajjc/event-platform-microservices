@@ -1,4 +1,4 @@
-﻿using EventPlatform.Domen;
+using EventPlatform.Domen;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventPlatform.Data
@@ -20,20 +20,22 @@ namespace EventPlatform.Data
             modelBuilder.Entity<StrucniDogadjaj>()
                 .HasOne(sd => sd.Lokacija)
                 .WithMany(l => l.StrucniDogadjaji)
-                .HasForeignKey(sd => sd.LokacijaID);
+                .HasForeignKey(sd => sd.LokacijaID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StrucniDogadjaj>()
                 .HasMany(sd => sd.Predavaci)
                 .WithMany(p => p.StrucniDogadjaji)
                 .UsingEntity<Dictionary<string, object>>(
                     "StrucniDogadjajiPredavaci",
-                    t => t.HasOne<Predavac>().WithMany().HasForeignKey("PredavacID"),
-                    t => t.HasOne<StrucniDogadjaj>().WithMany().HasForeignKey("StrucniDogadjajID")
+                    t => t.HasOne<Predavac>().WithMany().HasForeignKey("PredavacID").OnDelete(DeleteBehavior.Restrict),
+                    t => t.HasOne<StrucniDogadjaj>().WithMany().HasForeignKey("StrucniDogadjajID").OnDelete(DeleteBehavior.Restrict)
                 );
             modelBuilder.Entity<StrucniDogadjaj>()
                 .HasOne(sd => sd.TipDogadjaja)
                 .WithMany(tip => tip.StrucniDogadjaji)
-                .HasForeignKey(sd => sd.TipDogadjajaID);
+                .HasForeignKey(sd => sd.TipDogadjajaID)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }
