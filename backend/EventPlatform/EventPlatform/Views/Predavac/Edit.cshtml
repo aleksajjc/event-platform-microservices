@@ -3,6 +3,27 @@
 
 <h1>Izmena predavača</h1>
 
-<form>
+<form asp-action="Edit">
+	<input type="hidden" asp-for="PredavacID"/>
 
+	<div class="mb-3">
+		<label for="Ime" class="form-label">Ime</label>
+		<input type="text" class="form-control" asp-for="Ime"/>
+	</div>
+
+	<div class="mb-3">
+		<label for="Prezime" class="form-label">Prezime</label>
+		<input type="text" class="form-control" asp-for="Prezime" />
+	</div>
+
+	<div class="mb-3">
+		<label for="Titula" class="form-label">Titula</label>
+		<input type="text" class="form-control" asp-for="Titula" />
+	</div>
+
+	<div class="mb-3">
+		<label for="OblastStrucnosti" class="form-label">Oblast stručnosti</label>
+		<input type="text" class="form-control" asp-for="OblastStrucnosti" />
+	</div>
+	<button type="submit" class="btn btn-primary">Izmeni</button>
 </form>

@@ -3,6 +3,7 @@ using EventPlatform.Domen;
 using EventPlatform.Models.Dogadjaji;
 using EventPlatform.Models.Predavac;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventPlatform.Controllers
 {
@@ -50,6 +51,58 @@ namespace EventPlatform.Controllers
                 }).ToList()
             }).ToList();
             return View(predavaci);
+        }
+        [HttpGet]
+        public IActionResult Edit(int Id)
+        {
+            var predavac = context.Predavaci
+                            .FirstOrDefault(p => p.PredavacID == Id);
+
+            if(predavac == null)
+            {
+                return NotFound();
+            }
+            var model = new PredavacCreateViewModel
+            {
+                PredavacID = predavac.PredavacID,
+                Ime = predavac.Ime,
+                Prezime = predavac.Prezime,
+                Titula = predavac.Titula,
+                OblastStrucnosti = predavac.OblastStrucnosti
+            };
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult Edit(PredavacCreateViewModel model)
+        {
+            var predavac = context.Predavaci
+                                .FirstOrDefault(p => p.PredavacID == model.PredavacID);
+            if(predavac == null)
+            {
+                return NotFound();
+            }
+            predavac.Ime = model.Ime;
+            predavac.Prezime = model.Prezime;
+            predavac.Titula = model.Titula;
+            predavac.OblastStrucnosti = model.OblastStrucnosti;
+
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        public IActionResult Delete(int Id)
+        {
+            var predavac = context.Predavaci
+                            .FirstOrDefault(p => p.PredavacID == Id);
+            if(predavac == null)
+            {
+                return NotFound();
+            }
+            context.Predavaci.Remove(predavac);
+            context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }

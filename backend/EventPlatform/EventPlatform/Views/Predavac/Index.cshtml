@@ -38,6 +38,26 @@
 						<br />
 					}
 				</td>
+				<td>
+					<a href="@Url.Action("Edit","Predavac", new {Id = item.PredavacID})" 
+					class="btn btn-primary btn-sm">Izmeni</a>
+				</td>
+				<td>
+					@if (item.OdabraniStrucniDogadjaji.Any())
+					{
+						<button class="btn btn-secondary btn-sm" disabled title="Nije moguće obrisati predavača sa događajima">
+							Obriši
+						</button>
+					}
+					else
+					{
+							<form asp-action="Delete" asp-route-id="@item.PredavacID" method="post" style="display:inline;">
+								<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Da li ste sigurni?')">
+									Obriši
+								</button>
+							</form>
+					}
+				</td>
 			</tr>
 		}
 	</tbody>
