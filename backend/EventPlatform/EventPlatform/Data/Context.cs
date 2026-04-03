@@ -12,6 +12,8 @@ namespace EventPlatform.Data
         public DbSet<TipDogadjaja> TipoviDogadjaja { get; set; }
         public DbSet<Predavac> Predavaci { get; set; }
         public DbSet<Lokacija> Lokacije { get; set; }
+        public DbSet<Ucesnik> Ucesnici { get; set; }
+        public DbSet<Prijava> Prijave { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +39,20 @@ namespace EventPlatform.Data
                 .HasForeignKey(sd => sd.TipDogadjajaID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Prijava>()
+                .HasKey(pr => new {pr.UcesnikID,pr.StrucniDogadjajID});
+
+            modelBuilder.Entity<Prijava>()
+                .HasOne(sd => sd.StrucniDogadjaj)
+                .WithMany(sd => sd.Prijave)
+                .HasForeignKey(pr => pr.StrucniDogadjajID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Prijava>()
+                .HasOne(u => u.Ucesnik)
+                .WithMany(u => u.Prijave)
+                .HasForeignKey(pr => pr.UcesnikID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

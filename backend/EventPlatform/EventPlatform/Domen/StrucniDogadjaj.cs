@@ -13,5 +13,6 @@
         public List<Predavac> Predavaci { get; set; }
         public TipDogadjaja TipDogadjaja { get; set; }
         public int TipDogadjajaID { get; set; }
+        public List<Prijava> Prijave { get; set; }
     }
 }
