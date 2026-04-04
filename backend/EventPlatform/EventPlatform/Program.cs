@@ -7,7 +7,7 @@ namespace EventPlatform
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddSqlServer<Context>(builder.Configuration.GetConnectionString("DefaultConnection"));
+            builder.Services.AddSqlServer<Context>(builder.Configuration.GetConnectionString("DefaultConnectionEvent"));
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventPlatform", "EventPlatform\EventPlatform.csproj", "{20705CB0-2166-4AB2-800F-DFFA55FA9E4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Events.API", "Events.API\Events.API.csproj", "{437CEA9A-61CF-4E64-86ED-651D8C9EE6BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTO", "DTO\DTO.csproj", "{889F5752-EEB4-4541-A3A9-97026047DEE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{20705CB0-2166-4AB2-800F-DFFA55FA9E4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20705CB0-2166-4AB2-800F-DFFA55FA9E4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20705CB0-2166-4AB2-800F-DFFA55FA9E4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{437CEA9A-61CF-4E64-86ED-651D8C9EE6BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{437CEA9A-61CF-4E64-86ED-651D8C9EE6BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{437CEA9A-61CF-4E64-86ED-651D8C9EE6BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{437CEA9A-61CF-4E64-86ED-651D8C9EE6BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{889F5752-EEB4-4541-A3A9-97026047DEE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{889F5752-EEB4-4541-A3A9-97026047DEE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{889F5752-EEB4-4541-A3A9-97026047DEE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{889F5752-EEB4-4541-A3A9-97026047DEE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
