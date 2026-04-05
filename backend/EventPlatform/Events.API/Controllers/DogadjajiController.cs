@@ -101,10 +101,95 @@ namespace Events.API.Controllers
             return Ok(noviDogadjaj.StrucniDogadjajID);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<StrucniDogadjajDTO>> GetById(int id)
+        {
+            var dogadjaj = await Context.StrucniDogadjaji
+                .Include(sd => sd.Lokacija)
+                .Include(sd => sd.TipDogadjaja)
+                .Include(sd => sd.Predavaci)
+                .FirstOrDefaultAsync(sd => sd.StrucniDogadjajID == id);
+
+            if (dogadjaj == null) return NotFound();
+
+            var dto = new StrucniDogadjajDTO
+            {
+                StrucniDogadjajID = dogadjaj.StrucniDogadjajID,
+                Naziv = dogadjaj.Naziv,
+                Agenda = dogadjaj.Agenda,
+                DatumVremeOdrzavanja = dogadjaj.DatumVremeOdrzavanja,
+                Trajanje = dogadjaj.Trajanje,
+                CenaKotizacije = dogadjaj.CenaKotizacije,
+                Lokacija = new LokacijaDTO
+                {
+                    LokacijaID = dogadjaj.Lokacija.LokacijaID,
+                    Naziv = dogadjaj.Lokacija.Naziv,
+                    Adresa = dogadjaj.Lokacija.Adresa,
+                    Kapacitet = dogadjaj.Lokacija.Kapacitet
+                },
+                TipDogadjaja = new TipDogadjajaDTO
+                {
+                    TipDogadjajaID = dogadjaj.TipDogadjaja.TipDogadjajaID,
+                    NazivTipa = dogadjaj.TipDogadjaja.NazivTipa
+                },
+                Predavaci = dogadjaj.Predavaci.Select(p => new PredavacDTO
+                {
+                    PredavacID = p.PredavacID,
+                    Ime = p.Ime,
+                    Prezime = p.Prezime,
+                    Titula = p.Titula,
+                    OblastStrucnosti = p.OblastStrucnosti
+                }).ToList()
+            };
+
+            return Ok(dto);
+        }
+
         [HttpPut]
         public async Task<ActionResult> Edit(StrucniDogadjajCreateDTO request)
         {
+            var dogadjaj = await Context.StrucniDogadjaji
+                            .Include(sd => sd.Predavaci)
+                            .Where(sd => sd.StrucniDogadjajID == request.StrucniDogadjajID)
+                            .FirstOrDefaultAsync();
 
+            if (dogadjaj == null)
+            {
+                return NotFound();
+            }
+
+            dogadjaj.Naziv = request.Naziv;
+            dogadjaj.Agenda = request.Agenda;
+            dogadjaj.DatumVremeOdrzavanja = request.DatumVremeOdrzavanja;
+            dogadjaj.Trajanje = request.Trajanje;
+            dogadjaj.CenaKotizacije = request.CenaKotizacije;
+            dogadjaj.LokacijaID = request.LokacijaID;
+            dogadjaj.Predavaci.Clear();
+            dogadjaj.Predavaci = Context.Predavaci
+                                  .Where(p => request.PredavaciIDs.Contains(p.PredavacID))
+                                  .ToList();
+            dogadjaj.TipDogadjajaID = request.TipDogadjajaID;
+
+            await Context.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpDelete("{Id}")]
+        public async Task<ActionResult> Delete(int Id)
+        {
+            var dogadjaj = await Context.StrucniDogadjaji
+                                .Include(sd => sd.Predavaci)
+                                .FirstOrDefaultAsync(sd => sd.StrucniDogadjajID == Id);
+
+            if(dogadjaj == null)
+            {
+                return NotFound();
+            }
+            dogadjaj.Predavaci.Clear();
+
+            Context.Remove(dogadjaj);
+            await Context.SaveChangesAsync();
+            return Ok();
         }
     }
 }

@@ -159,78 +159,85 @@ namespace EventPlatform.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public async Task<IActionResult> Edit(int Id)
         {
-            var odabranDogadjaj = context.StrucniDogadjaji
-                                    .Include(sd => sd.Predavaci)
-                                    .FirstOrDefault(sd => sd.StrucniDogadjajID == Id);
-            if(odabranDogadjaj == null)
-            {
-                return NotFound();
-            }
+            var client = httpClientFactory.CreateClient("EventsAPI");
+
+            var dogadjaj = await client.GetFromJsonAsync<StrucniDogadjajDTO>($"/Dogadjaji/{Id}");
+
+            if (dogadjaj == null) return NotFound();
 
             var model = new DogadjajCreateViewModel
             {
-                StrucniDogadjajID = odabranDogadjaj.StrucniDogadjajID,
-                Naziv = odabranDogadjaj.Naziv,
-                Agenda = odabranDogadjaj.Agenda,
-                DatumVremeOdrzavanja = odabranDogadjaj.DatumVremeOdrzavanja,
-                Trajanje = odabranDogadjaj.Trajanje,
-                CenaKotizacije = odabranDogadjaj.CenaKotizacije,
-                LokacijaID = odabranDogadjaj.LokacijaID,
-                OdabraniPredavaciID = odabranDogadjaj.Predavaci.Select(p => p.PredavacID).ToList(),
-                TipDogadjajaID = odabranDogadjaj.TipDogadjajaID
+                StrucniDogadjajID = dogadjaj.StrucniDogadjajID,
+                Naziv = dogadjaj.Naziv,
+                Agenda = dogadjaj.Agenda,
+                DatumVremeOdrzavanja = dogadjaj.DatumVremeOdrzavanja,
+                Trajanje = dogadjaj.Trajanje,
+                CenaKotizacije = dogadjaj.CenaKotizacije,
+                LokacijaID = dogadjaj.Lokacija.LokacijaID,
+                TipDogadjajaID = dogadjaj.TipDogadjaja.TipDogadjajaID,
+                OdabraniPredavaciID = dogadjaj.Predavaci.Select(p => p.PredavacID).ToList()
             };
-            var lokacije = context.Lokacije.ToList();
-            ViewBag.lokacijeList = new SelectList(lokacije.Select(l => new { l.LokacijaID, Prikaz = l.Naziv + " (Kapacitet: " + l.Kapacitet + ")" }), "LokacijaID", "Prikaz");
-            ViewBag.tipoviList = new SelectList(context.TipoviDogadjaja.ToList(), "TipDogadjajaID", "NazivTipa");
-            var predavaci = context.Predavaci.ToList();
-            ViewBag.predavaciList = new MultiSelectList(predavaci.Select(p => new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
+
+            var lokacije = await client.GetFromJsonAsync<List<LokacijaDTO>>("/Lokacije");
+            var tipovi = await client.GetFromJsonAsync<List<TipDogadjajaDTO>>("/TipoviDogadjaja");
+            var predavaci = await client.GetFromJsonAsync<List<PredavacDTO>>("/Predavaci");
+
+            ViewBag.lokacijeList = new SelectList(lokacije.Select(l =>
+                new { l.LokacijaID, Prikaz = l.Naziv + " (Kapacitet: " + l.Kapacitet + ")" }), "LokacijaID", "Prikaz");
+            ViewBag.tipoviList = new SelectList(tipovi, "TipDogadjajaID", "NazivTipa");
+            ViewBag.predavaciList = new MultiSelectList(predavaci.Select(p =>
+                new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
 
             return View(model);
         }
+
         [HttpPost]
-        public IActionResult Edit(DogadjajCreateViewModel model)
+        public async Task<IActionResult> Edit(DogadjajCreateViewModel model)
         {
-            var dogadjajAzuriran = context.StrucniDogadjaji
-                            .Include(sd => sd.Predavaci)
-                            .FirstOrDefault(sd => sd.StrucniDogadjajID == model.StrucniDogadjajID);
-            if(dogadjajAzuriran == null)
+            var client = httpClientFactory.CreateClient("EventsAPI");
+
+            var dogadjajDTO = new StrucniDogadjajCreateDTO
             {
-                return NotFound();
+                StrucniDogadjajID = model.StrucniDogadjajID,
+                Naziv = model.Naziv,
+                Agenda = model.Agenda,
+                DatumVremeOdrzavanja = model.DatumVremeOdrzavanja,
+                Trajanje = model.Trajanje,
+                CenaKotizacije = model.CenaKotizacije,
+                LokacijaID = model.LokacijaID,
+                PredavaciIDs = model.OdabraniPredavaciID,
+                TipDogadjajaID = model.TipDogadjajaID
+            };
+
+            var response = await client.PutAsJsonAsync("/Dogadjaji", dogadjajDTO);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
             }
 
-            dogadjajAzuriran.Naziv = model.Naziv;
-            dogadjajAzuriran.Agenda = model.Agenda;
-            dogadjajAzuriran.DatumVremeOdrzavanja = model.DatumVremeOdrzavanja;
-            dogadjajAzuriran.Trajanje = model.Trajanje;
-            dogadjajAzuriran.CenaKotizacije = model.CenaKotizacije;
-            dogadjajAzuriran.LokacijaID = model.LokacijaID;
-            dogadjajAzuriran.TipDogadjajaID = model.TipDogadjajaID;
-
-            dogadjajAzuriran.Predavaci.Clear();
-            dogadjajAzuriran.Predavaci = context.Predavaci
-                                         .Where(p => model.OdabraniPredavaciID.Contains(p.PredavacID))
-                                         .ToList();
-            context.SaveChanges();
-
-            return RedirectToAction("Index");
+            return View(model);
+            
         }
         [HttpPost]
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            var dogadjaj = context.StrucniDogadjaji
-                           .Include(sd => sd.Predavaci)
-                           .FirstOrDefault(sd => sd.StrucniDogadjajID == Id);
-            if(dogadjaj == null)
-            {
-                return NotFound();
-            }
-            dogadjaj.Predavaci.Clear();
-            context.StrucniDogadjaji.Remove(dogadjaj);
-            context.SaveChanges();
 
+            var client = httpClientFactory.CreateClient("EventsAPI");
+
+            var response = await client.DeleteAsync($"/Dogadjaji/{Id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.ExceptionMessage = "Greška pri brisanju dogadjaja";
             return RedirectToAction("Index");
+
+  
         }
     }
 }
