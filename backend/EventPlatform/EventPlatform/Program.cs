@@ -7,8 +7,14 @@ namespace EventPlatform
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddSqlServer<Context>(builder.Configuration.GetConnectionString("DefaultConnectionEvent"));
+            builder.Services.AddSqlServer<Context>(builder.Configuration.GetConnectionString("DefaultConnection"));
 
+            builder.Services.AddHttpClient("EventsAPI", (client) =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(10);
+
+                client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("EventsAPIEndPoint")!);
+            });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 

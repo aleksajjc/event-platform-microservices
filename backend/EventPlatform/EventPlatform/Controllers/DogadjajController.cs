@@ -1,3 +1,4 @@
+using DTO.StrucniDogadjaji;
 using EventPlatform.Data;
 using EventPlatform.Domen;
 using EventPlatform.Models.Dogadjaji;
@@ -7,17 +8,21 @@ using EventPlatform.Models.TipDogadjaja;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using System.Threading.Tasks;
 
 namespace EventPlatform.Controllers
 {
     public class DogadjajController : Controller
     {
 
-        public DogadjajController(Context context)
+        public DogadjajController(Data.Context context, IHttpClientFactory httpClientFactory)
         {
             this.context = context;
+            this.httpClientFactory = httpClientFactory;
         }
-        public Context context { get; }
+        public Data.Context context { get; }
+        public IHttpClientFactory httpClientFactory { get; }
 
         [HttpGet]
         public IActionResult Create()  
@@ -59,8 +64,73 @@ namespace EventPlatform.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var eventsHttpClient = httpClientFactory.CreateClient("EventsAPI");
+
+            try
+            {
+                HttpResponseMessage? httpResponseMessage = null;
+
+                var retryPolicy = Polly.Policy.Handle<HttpRequestException>()
+                    .WaitAndRetryAsync(3, attemp => TimeSpan.FromMicroseconds(250));
+
+                httpResponseMessage = await retryPolicy.ExecuteAsync<HttpResponseMessage>(async () =>
+                {
+                    httpResponseMessage = await eventsHttpClient.GetAsync("/Dogadjaji");
+
+                    httpResponseMessage.EnsureSuccessStatusCode();
+
+                    return httpResponseMessage;
+                });
+
+                var StrucniDogadjajDTOs = await httpResponseMessage.Content.ReadFromJsonAsync<List<StrucniDogadjajDTO>>();
+
+                var dogadjajViewModels = StrucniDogadjajDTOs.Select(sd => new DogadjajViewModel
+                {
+                    StrucniDogadjajID = sd.StrucniDogadjajID,
+                    Naziv = sd.Naziv,
+                    Agenda = sd.Agenda,
+                    DatumVremeOdrzavanja = sd.DatumVremeOdrzavanja,
+                    Trajanje = sd.Trajanje,
+                    CenaKotizacije = sd.CenaKotizacije,
+                    Lokacija = new LokacijaViewModel
+                    {
+                        LokacijaID = sd.Lokacija.LokacijaID,
+                        Naziv = sd.Lokacija.Naziv,
+                        Adresa = sd.Lokacija.Adresa,
+                        Kapacitet = sd.Lokacija.Kapacitet
+                    },
+                    Predavaci = sd.Predavaci.Select(p => new PredavacViewModel
+                    {
+                        PredavacID = p.PredavacID,
+                        Ime = p.Ime,
+                        Prezime = p.Prezime,
+                        Titula = p.Titula,
+                        OblastStrucnosti = p.OblastStrucnosti
+                    }).ToList(),
+
+                    TipDogadjaja = new TipDogadjajaViewModel
+                    {
+                        TipDogadjajaID = sd.TipDogadjaja.TipDogadjajaID,
+                        NazivTipa = sd.TipDogadjaja.NazivTipa
+                    }
+                }).ToList();
+
+                return View(dogadjajViewModels);
+            }
+            catch (TaskCanceledException ex)
+            {
+                ViewBag.ExceptionMessage = "Ne možemo uèitati dogadjaje, vreme isteklo";
+                return View(new List<DogadjajViewModel>());
+            }
+            catch(HttpRequestException ex)
+            {
+                ViewBag.ExceptionMessage = "Ne možemo uèitati dogadjaje, dostignut je maksimalan broj pokušaja";
+                return View(new List<DogadjajViewModel>());
+            }
+
+            /*
             var listaDogadjaja = context.StrucniDogadjaji
                                   .Include(sd => sd.Predavaci)
                                   .Include(sd => sd.TipDogadjaja)
@@ -77,7 +147,7 @@ namespace EventPlatform.Controllers
                                       TipDogadjaja = new TipDogadjajaViewModel {NazivTipa = d.TipDogadjaja.NazivTipa},
                                       Predavaci = d.Predavaci.Select(p => new PredavacViewModel { Ime = p.Ime, Prezime = p.Prezime }).ToList()
                                   }).ToList();
-            return View(listaDogadjaja);
+            return View(listaDogadjaja); */
         }
 
         [HttpGet]
