@@ -1,4 +1,4 @@
-﻿using EventPlatform.Domen;
+﻿using Events.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Events.API.Data

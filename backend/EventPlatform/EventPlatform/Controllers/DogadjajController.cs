@@ -1,4 +1,7 @@
+using DTO.Lokacije;
+using DTO.Predavaci;
 using DTO.StrucniDogadjaji;
+using DTO.TipoviDogadjaja;
 using EventPlatform.Data;
 using EventPlatform.Domen;
 using EventPlatform.Models.Dogadjaji;
@@ -25,27 +28,29 @@ namespace EventPlatform.Controllers
         public IHttpClientFactory httpClientFactory { get; }
 
         [HttpGet]
-        public IActionResult Create()  
+        public async Task<IActionResult> Create()  
         {
-            var lokacije = context.Lokacije.ToList();
-            ViewBag.lokacijeList = new SelectList(lokacije.Select
-            (l => new { l.LokacijaID, Prikaz = l.Naziv + " (Kapacitet: " + l.Kapacitet + ")" }), "LokacijaID", "Prikaz");
+            var client = httpClientFactory.CreateClient("EventsAPI");
+ 
+            var lokacije = await client.GetFromJsonAsync<List<LokacijaDTO>>("/Lokacije");
+            var tipovi = await client.GetFromJsonAsync<List<TipDogadjajaDTO>>("/TipoviDogadjaja");
+            var predavaci = await client.GetFromJsonAsync<List<PredavacDTO>>("/Predavaci");
 
-            var tipovi = context.TipoviDogadjaja.ToList();
+            ViewBag.lokacijeList = new SelectList(lokacije.Select(l =>
+                new { l.LokacijaID, Prikaz = l.Naziv + " (Kapacitet: " + l.Kapacitet + ")" }), "LokacijaID", "Prikaz");
             ViewBag.tipoviList = new SelectList(tipovi, "TipDogadjajaID", "NazivTipa");
-
-            var predavaci = context.Predavaci.ToList();
-            ViewBag.predavaciList = new MultiSelectList(predavaci.Select
-           (p => new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
-
+            ViewBag.predavaciList = new MultiSelectList(predavaci.Select(p =>
+                new { p.PredavacID, Prikaz = p.Ime + " " + p.Prezime + " - " + p.OblastStrucnosti }), "PredavacID", "Prikaz");
+            
             return View(new DogadjajCreateViewModel());
         }
 
         [HttpPost]
-        public IActionResult Create(DogadjajCreateViewModel model)
+        public async Task<IActionResult> Create(DogadjajCreateViewModel model)
         {
+            var eventsHttpClient = httpClientFactory.CreateClient("EventsAPI");
 
-            var noviDogadjaj = new StrucniDogadjaj
+            var noviDogadjaj = new StrucniDogadjajCreateDTO
             {
                 Naziv = model.Naziv,
                 Agenda = model.Agenda,
@@ -53,15 +58,18 @@ namespace EventPlatform.Controllers
                 Trajanje = model.Trajanje,
                 CenaKotizacije = model.CenaKotizacije,
                 LokacijaID = model.LokacijaID,
-                TipDogadjajaID = model.TipDogadjajaID,
-                Predavaci = context.Predavaci
-                            .Where(p => model.OdabraniPredavaciID.Contains(p.PredavacID))
-                            .ToList()
+                PredavaciIDs = model.OdabraniPredavaciID,
+                TipDogadjajaID = model.TipDogadjajaID
             };
-            context.StrucniDogadjaji.Add(noviDogadjaj);
-            context.SaveChanges();
 
-            return RedirectToAction("Index");
+            var response = await eventsHttpClient.PostAsJsonAsync("/Dogadjaji", noviDogadjaj);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
         }
 
         public async Task<IActionResult> Index()

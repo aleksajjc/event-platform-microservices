@@ -1,4 +1,4 @@
-﻿namespace EventPlatform.Domen
+﻿namespace Events.API.Models
 {
     public class TipDogadjaja
     {

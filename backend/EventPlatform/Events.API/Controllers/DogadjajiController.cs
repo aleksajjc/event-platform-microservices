@@ -3,9 +3,11 @@ using DTO.Predavaci;
 using DTO.StrucniDogadjaji;
 using DTO.TipoviDogadjaja;
 using Events.API.Data;
+using Events.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Events.API.Controllers
 {
@@ -74,6 +76,35 @@ namespace Events.API.Controllers
 
             logger.LogInformation("Uspesno vraceni dogadjaji!");
             return Ok(dogadjajiDTO);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<int>> Create(StrucniDogadjajCreateDTO request)
+        {
+            var noviDogadjaj = new StrucniDogadjaj
+            {
+                Naziv = request.Naziv,
+                Agenda = request.Agenda,
+                DatumVremeOdrzavanja = request.DatumVremeOdrzavanja,
+                Trajanje = request.Trajanje,
+                CenaKotizacije = request.CenaKotizacije,
+                LokacijaID = request.LokacijaID,
+                Predavaci = Context.Predavaci
+                    .Where(p => request.PredavaciIDs.Contains(p.PredavacID))
+                    .ToList(),
+                TipDogadjajaID = request.TipDogadjajaID
+            };
+
+            Context.Add(noviDogadjaj);
+            await Context.SaveChangesAsync();
+
+            return Ok(noviDogadjaj.StrucniDogadjajID);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> Edit(StrucniDogadjajCreateDTO request)
+        {
+
         }
     }
 }
