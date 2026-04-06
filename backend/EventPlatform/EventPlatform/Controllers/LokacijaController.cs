@@ -1,3 +1,4 @@
+using DTO.Lokacije;
 using EventPlatform.Data;
 using EventPlatform.Domen;
 using EventPlatform.Models.Dogadjaji;
@@ -5,16 +6,19 @@ using EventPlatform.Models.Lokacija;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace EventPlatform.Controllers
 {
     public class LokacijaController : Controller
     {
-        public LokacijaController(Context context)
+        public LokacijaController(Context context, IHttpClientFactory httpClientFactory)
         {
             this.context = context;
+            this.httpClientFactory = httpClientFactory;
         }
         public Context context { get; }
+        public IHttpClientFactory httpClientFactory { get; }
 
         [HttpGet]
         public IActionResult Create()
@@ -23,46 +27,60 @@ namespace EventPlatform.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(LokacijaCreateViewModel model)
+        public async Task<IActionResult> Create(LokacijaCreateViewModel model)
         {
-            var novaLokacija = new Lokacija
+            var novaLokacija = new LokacijaCreateDTO
             {
                 Naziv = model.Naziv,
                 Adresa = model.Adresa,
-                Kapacitet = model.Kapacitet
+                Kapacitet = model.Kapacitet,
             };
-            context.Lokacije.Add(novaLokacija);
-            context.SaveChanges();
 
-            return RedirectToAction("Index");
+            var client = httpClientFactory.CreateClient("EventsAPI");
+
+            var response = await client.PostAsJsonAsync("/Lokacije", novaLokacija);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
         }
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var listaLokacija = context.Lokacije
-                                .Include(l => l.StrucniDogadjaji)
-                                .Select(l => new LokacijaViewModel
-                                {
-                                    LokacijaID = l.LokacijaID,
-                                    Naziv = l.Naziv,
-                                    Adresa = l.Adresa,
-                                    Kapacitet = l.Kapacitet,
-                                    OdabraniStrucniDogadjaji = l.StrucniDogadjaji.Select(sd => new DogadjajViewModel
-                                    {
-                                        Naziv = sd.Naziv,
-                                        DatumVremeOdrzavanja = sd.DatumVremeOdrzavanja,
-                                        Trajanje = sd.Trajanje
-                                    }).ToList()
-                                }).ToList();
+            
+            var client = httpClientFactory.CreateClient("EventsAPI");
+
+            var lokacije = await client.GetFromJsonAsync<List<LokacijaDTO>>("/Lokacije");
+
+            var listaLokacija = lokacije.Select(l => new LokacijaViewModel
+            {
+                LokacijaID = l.LokacijaID,
+                Naziv = l.Naziv,
+                Adresa = l.Adresa,
+                Kapacitet = l.Kapacitet,
+                OdabraniStrucniDogadjaji = l.StrucniDogadjaji.Select(sd => new DogadjajViewModel
+                {
+                    Naziv = sd.Naziv,
+                    DatumVremeOdrzavanja = sd.DatumVremeOdrzavanja,
+                    Trajanje = sd.Trajanje
+                }).ToList()
+            }).ToList();
+            
+
             return View(listaLokacija);
         }
 
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public async Task<IActionResult> Edit(int Id)
         {
-            var lokacija = context.Lokacije
-                           .FirstOrDefault(l => l.LokacijaID == Id);
+            var client = httpClientFactory.CreateClient("EventsAPI");
+
+            var lokacija = await client.GetFromJsonAsync<LokacijaDTO>($"/Lokacije/{Id}");
+
             if(lokacija == null)
             {
                 return NotFound();
@@ -77,30 +95,40 @@ namespace EventPlatform.Controllers
             return View(model);
         }
         [HttpPost]
-        public IActionResult Edit(LokacijaCreateViewModel model)
+        public async Task<IActionResult> Edit(LokacijaCreateViewModel model)
         {
-            var lokacija = context.Lokacije
-                            .FirstOrDefault(l => l.LokacijaID == model.LokacijaID);
-            if(lokacija == null)
-            {
-                return NotFound();
-            }
-            lokacija.Naziv = model.Naziv;
-            lokacija.Adresa = model.Adresa;
-            lokacija.Kapacitet = model.Kapacitet;
-            context.SaveChanges();
+            var client = httpClientFactory.CreateClient("EventsAPI");
 
-            return RedirectToAction("Index");
+            var lokacijaDTO = new LokacijaCreateDTO
+            {
+                LokacijaID = model.LokacijaID,
+                Naziv = model.Naziv,
+                Adresa = model.Adresa,
+                Kapacitet = model.Kapacitet
+            };
+
+            var response = await client.PutAsJsonAsync("/Lokacije",lokacijaDTO);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(model);
         }
         [HttpPost]
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            var lokacija = context.Lokacije
-                            .FirstOrDefault(l => l.LokacijaID == Id);
+            var client = httpClientFactory.CreateClient("EventsAPI");
 
-            context.Lokacije.Remove(lokacija);
-            context.SaveChanges();
-            return RedirectToAction("Index");           
+            var response = await client.DeleteAsync($"/Lokacije/{Id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.ExceptionMessage = "Greška pri brisanju lokacije";
+            return RedirectToAction("Index");
         }
     }
 }

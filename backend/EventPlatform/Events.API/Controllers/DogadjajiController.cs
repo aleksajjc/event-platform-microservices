@@ -24,7 +24,7 @@ namespace Events.API.Controllers
             this.Context = Context;
             this.logger = logger;
         }
-
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StrucniDogadjajDTO>>> Get()
         {
