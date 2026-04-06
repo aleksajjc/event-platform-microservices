@@ -1,0 +1,16 @@
+@using EventPlatform.Models.TipDogadjaja
+@model TipDogadjajaCreateViewModel
+
+<h1>Kreiraj Novi Tip Događaja</h1>
+
+<form asp-action="Create">
+    <div class="mb-3">
+        <label asp-for="NazivTipa" class="form-label">Naziv Tipa</label>
+        <input type="text" class="form-control" asp-for="NazivTipa" placeholder="Unesite naziv tipa (npr. Konferencija, Radionica...)"/>
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Kreiraj</button>
+        <a asp-action="Index" class="btn btn-secondary">Nazad na listu</a>
+    </div>
+</form>

@@ -1,4 +1,3 @@
-using DTO.StrucniDogadjaji;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace DTO.TipoviDogadjaja
 {
-    public class TipDogadjajaDTO
+    public class TipDogadjajaCreateDTO
     {
         public int TipDogadjajaID { get; set; }
         public string NazivTipa { get; set; }
-        public List<StrucniDogadjajDTO> StrucniDogadjaji { get; set; }
     }
 }

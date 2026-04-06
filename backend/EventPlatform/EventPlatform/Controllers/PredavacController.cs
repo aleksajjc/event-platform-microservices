@@ -1,19 +1,23 @@
-﻿using EventPlatform.Data;
+﻿using DTO.Predavaci;
+using EventPlatform.Data;
 using EventPlatform.Domen;
 using EventPlatform.Models.Dogadjaji;
 using EventPlatform.Models.Predavac;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace EventPlatform.Controllers
 {
     public class PredavacController : Controller
     {
-        public PredavacController(Context context)
+        public PredavacController(Context context, IHttpClientFactory httpClientFactory)
         {
-            this.context = context;
+            _context = context;
+            _httpClientFactory = httpClientFactory;
         }
-        public Context context { get; }
+        public Context _context { get; }
+        public IHttpClientFactory _httpClientFactory { get; }
 
         [HttpGet]
         public IActionResult Create()
@@ -21,23 +25,34 @@ namespace EventPlatform.Controllers
             return View(new PredavacCreateViewModel());
         }
         [HttpPost]
-        public IActionResult Create(PredavacCreateViewModel model)
+        public async Task<IActionResult> Create(PredavacCreateViewModel model)
         {
-            var noviPredavac = new Predavac
+            var client = _httpClientFactory.CreateClient("EventsAPI");
+
+            var noviPredavac = new PredavacCreateDTO
             {
                 Ime = model.Ime,
                 Prezime = model.Prezime,
                 Titula = model.Titula,
                 OblastStrucnosti = model.OblastStrucnosti
             };
-            context.Predavaci.Add(noviPredavac);
-            context.SaveChanges();
 
-            return RedirectToAction("Index");
+            var response = await client.PostAsJsonAsync("/Predavaci", noviPredavac);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(model);
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var predavaci = context.Predavaci.Select(p => new PredavacViewModel
+
+            var client = _httpClientFactory.CreateClient("EventsAPI");
+
+            var predavaci = await client.GetFromJsonAsync<List<PredavacDTO>>("/Predavaci");
+
+            var listaPredavaci = predavaci.Select(p => new PredavacViewModel
             {
                 PredavacID = p.PredavacID,
                 Ime = p.Ime,
@@ -50,13 +65,14 @@ namespace EventPlatform.Controllers
                     DatumVremeOdrzavanja = sd.DatumVremeOdrzavanja
                 }).ToList()
             }).ToList();
-            return View(predavaci);
+            return View(listaPredavaci);
         }
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public async Task<IActionResult> Edit(int Id)
         {
-            var predavac = context.Predavaci
-                            .FirstOrDefault(p => p.PredavacID == Id);
+            var client = _httpClientFactory.CreateClient("EventsAPI");
+
+            var predavac = await client.GetFromJsonAsync<PredavacDTO>($"/Predavaci/{Id}");
 
             if(predavac == null)
             {
@@ -72,36 +88,42 @@ namespace EventPlatform.Controllers
             };
             return View(model);
         }
+
         [HttpPost]
-        public IActionResult Edit(PredavacCreateViewModel model)
+        public async Task<IActionResult> Edit(PredavacCreateViewModel model)
         {
-            var predavac = context.Predavaci
-                                .FirstOrDefault(p => p.PredavacID == model.PredavacID);
-            if(predavac == null)
+            var client = _httpClientFactory.CreateClient("EventsAPI");
+
+            var dto = new PredavacCreateDTO
             {
-                return NotFound();
+                PredavacID = model.PredavacID,
+                Ime = model.Ime,
+                Prezime = model.Prezime,
+                Titula = model.Titula,
+                OblastStrucnosti = model.OblastStrucnosti
+            };
+
+            var response = await client.PutAsJsonAsync("/Predavaci", dto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
             }
-            predavac.Ime = model.Ime;
-            predavac.Prezime = model.Prezime;
-            predavac.Titula = model.Titula;
-            predavac.OblastStrucnosti = model.OblastStrucnosti;
-
-            context.SaveChanges();
-
-            return RedirectToAction("Index");
+            return View(model);
         }
         [HttpPost]
-        public IActionResult Delete(int Id)
+        public async Task<IActionResult> Delete(int Id)
         {
-            var predavac = context.Predavaci
-                            .FirstOrDefault(p => p.PredavacID == Id);
-            if(predavac == null)
-            {
-                return NotFound();
-            }
-            context.Predavaci.Remove(predavac);
-            context.SaveChanges();
+            var client = _httpClientFactory.CreateClient("EventsAPI");
 
+            var response = await client.DeleteAsync($"/Predavaci/{Id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.ExceptionMessage = "Greška pri brisanju predavaca";
             return RedirectToAction("Index");
         }
     }
