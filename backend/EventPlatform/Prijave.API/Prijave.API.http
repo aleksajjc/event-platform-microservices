@@ -1,0 +1,6 @@
+@Prijave.API_HostAddress = http://localhost:5181
+
+GET {{Prijave.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
