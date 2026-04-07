@@ -104,6 +104,13 @@ namespace Events.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<StrucniDogadjajDTO>> GetById(int id)
         {
+            _counter++;
+
+            if (_counter % 4 != 0)
+            {
+                return StatusCode(500, "Simulated error on Details!");
+            }
+
             var dogadjaj = await Context.StrucniDogadjaji
                 .Include(sd => sd.Lokacija)
                 .Include(sd => sd.TipDogadjaja)

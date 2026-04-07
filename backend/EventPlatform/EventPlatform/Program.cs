@@ -1,4 +1,5 @@
 using EventPlatform.Data;
+using EventPlatform.Patterns;
 
 namespace EventPlatform
 {
@@ -8,6 +9,8 @@ namespace EventPlatform
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSqlServer<Context>(builder.Configuration.GetConnectionString("DefaultConnection"));
+            builder.Services.AddSingleton<CircuitBreaker>(sp =>
+                new CircuitBreaker(3, TimeSpan.FromSeconds(10)));
 
             builder.Services.AddHttpClient("EventsAPI", (client) =>
             {

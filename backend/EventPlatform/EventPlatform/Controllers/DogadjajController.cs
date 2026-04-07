@@ -1,4 +1,4 @@
-using DTO.Lokacije;
+ï»¿using DTO.Lokacije;
 using DTO.Predavaci;
 using DTO.StrucniDogadjaji;
 using DTO.TipoviDogadjaja;
@@ -8,6 +8,7 @@ using EventPlatform.Models.Dogadjaji;
 using EventPlatform.Models.Lokacija;
 using EventPlatform.Models.Predavac;
 using EventPlatform.Models.TipDogadjaja;
+using EventPlatform.Patterns;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +19,16 @@ namespace EventPlatform.Controllers
 {
     public class DogadjajController : Controller
     {
-
-        public DogadjajController(Data.Context context, IHttpClientFactory httpClientFactory)
+        public Data.Context context { get; }
+        public IHttpClientFactory httpClientFactory { get; }
+        public CircuitBreaker _circuitBreaker { get; set; }
+        public DogadjajController(Data.Context context, IHttpClientFactory httpClientFactory, CircuitBreaker circuitBreaker)
         {
             this.context = context;
             this.httpClientFactory = httpClientFactory;
+            _circuitBreaker = circuitBreaker;
         }
-        public Data.Context context { get; }
-        public IHttpClientFactory httpClientFactory { get; }
+        
 
         [HttpGet]
         public async Task<IActionResult> Create()  
@@ -129,12 +132,12 @@ namespace EventPlatform.Controllers
             }
             catch (TaskCanceledException ex)
             {
-                ViewBag.ExceptionMessage = "Ne možemo uèitati dogadjaje, vreme isteklo";
+                ViewBag.ExceptionMessage = "Ne moï¿½emo uï¿½itati dogadjaje, vreme isteklo";
                 return View(new List<DogadjajViewModel>());
             }
             catch(HttpRequestException ex)
             {
-                ViewBag.ExceptionMessage = "Ne možemo uèitati dogadjaje, dostignut je maksimalan broj pokušaja";
+                ViewBag.ExceptionMessage = "Ne moï¿½emo uï¿½itati dogadjaje, dostignut je maksimalan broj pokuï¿½aja";
                 return View(new List<DogadjajViewModel>());
             }
 
@@ -234,10 +237,57 @@ namespace EventPlatform.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.ExceptionMessage = "Greška pri brisanju dogadjaja";
+            ViewBag.ExceptionMessage = "Greska pri brisanju dogadjaja";
             return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public async Task<ActionResult> Details(int id)
+        {
+            var client = httpClientFactory.CreateClient("EventsAPI");
 
-  
+            try
+            {
+                var response = await _circuitBreaker.ExecuteAsync(async () =>
+                    {
+                        var res = await client.GetAsync($"/Dogadjaji/{id}");
+                        res.EnsureSuccessStatusCode();
+                        return res;
+                    });
+                var dogadjaji = await response.Content.ReadFromJsonAsync<StrucniDogadjajDTO>();
+
+                var listaDogadjaja = new DogadjajViewModel
+                {
+                    StrucniDogadjajID = dogadjaji.StrucniDogadjajID,
+                    Naziv = dogadjaji.Naziv,
+                    Agenda = dogadjaji.Agenda,
+                    DatumVremeOdrzavanja = dogadjaji.DatumVremeOdrzavanja,
+                    Trajanje = dogadjaji.Trajanje,
+                    CenaKotizacije = dogadjaji.CenaKotizacije,
+                    Lokacija = new LokacijaViewModel
+                    {
+                        Naziv = dogadjaji.Lokacija.Naziv,
+                        Adresa = dogadjaji.Lokacija.Adresa,
+                        Kapacitet = dogadjaji.Lokacija.Kapacitet
+                    },
+                    Predavaci = dogadjaji.Predavaci.Select(p => new PredavacViewModel
+                    {
+                        Ime = p.Ime,
+                        Prezime = p.Prezime,
+                        Titula = p.Titula,
+                        OblastStrucnosti = p.OblastStrucnosti
+                    }).ToList(),
+                    TipDogadjaja = new TipDogadjajaViewModel
+                    {
+                        NazivTipa = dogadjaji.TipDogadjaja.NazivTipa
+                    }
+                };
+
+                return View(listaDogadjaja);
+            }
+             catch (Exception ex) {
+                ViewBag.Message = "Zao nam je, API trenutno nije dostupan. Pokusajte ponovo kasnije.";
+                return View(new DogadjajViewModel()); 
+            }
         }
     }
 }
