@@ -1,0 +1,33 @@
+﻿@using EventPlatform.Models.Prijava
+@model PrijavaCreateViewModel
+
+<h1>Unesi novu prijavu</h1>
+
+<form asp-action="Create">
+	<div class="mb-3">
+		<label asp-for="Ime" class="form-label" >Ime</label>
+		<input type="text" class="form-control" asp-for="Ime" />
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="Prezime" class="form-label">Prezime</label>
+		<input type="text" class="form-control" asp-for="Prezime"/>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="Email" class="form-label">Email</label>
+		<input type="text" class="form-control" asp-for="Email" />
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="StrucniDogadjajID" class="form-label">Dogadjaji</label>
+		<select asp-for="StrucniDogadjajID" asp-items="ViewBag.Dogadjaji" class="form-control">
+			<option value="">-- Odaberite dogadjaj --</option>
+		</select>
+	</div>
+
+	<div class="mt-3">
+		<button type="submit" class="btn btn-primary">Unesi</button>
+		<a asp-action="Index" class="btn btn-secondary">Nazad na listu</a>
+	</div>
+</form>

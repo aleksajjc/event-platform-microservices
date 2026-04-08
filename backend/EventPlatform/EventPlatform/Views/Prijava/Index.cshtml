@@ -1,0 +1,36 @@
+﻿@using EventPlatform.Models.Prijava
+@model List<PrijavaViewModel>
+
+<h1>Spisak prijava</h1>
+
+<a asp-controller="Prijava" asp-action="Create" class="btn btn-primary">Kreiraj prijavu</a>
+
+<table class="table table-striped table-hover mt-3">
+	<thead>
+		<tr>
+			<th>Učesnik</th>
+			<th>Stručni dogadjaji</th>
+			<th>Predavači</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach(var item in Model)
+		{
+			<tr>
+				<td>
+					@item.Ucesnik.Ime @item.Ucesnik.Prezime @item.Ucesnik.Email
+				</td>
+
+				<td>
+					@item.Dogadjaj.Naziv
+				</td>
+				<td>
+					@foreach(var predavac in item.Predavaci)
+					{
+						<link @predavac.Ime @predavac.Prezime/>
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>

@@ -132,7 +132,7 @@ namespace EventPlatform.Controllers
             }
             catch (TaskCanceledException ex)
             {
-                ViewBag.ExceptionMessage = "Ne mo�emo u�itati dogadjaje, vreme isteklo";
+                ViewBag.ExceptionMessage = "Ne mozemo ucitati dogadjaje, vreme isteklo";
                 return View(new List<DogadjajViewModel>());
             }
             catch(HttpRequestException ex)
