@@ -1,4 +1,4 @@
-﻿using DTO.Prijave;
+using DTO.Prijave;
 using DTO.StrucniDogadjaji;
 using EventPlatform.Models.Dogadjaji;
 using EventPlatform.Models.Predavac;
@@ -28,7 +28,8 @@ namespace EventPlatform.Controllers
             var dogadjajiZaComboBox = dogadjaji.Select(d => new
             {
                 Id = d.StrucniDogadjajID,
-                Prikaz = $"{d.Naziv} {d.Agenda} {d.Lokacija.Naziv} {d.DatumVremeOdrzavanja}"
+                Prikaz = $"{d.Naziv} | {d.Agenda} | {d.Lokacija.Naziv} | {d.DatumVremeOdrzavanja:dd.MM.yyyy} | Predavači: " +
+                         string.Join(", ", d.Predavaci.Select(p => p.Ime + " " + p.Prezime))
             }).ToList();
 
             ViewBag.Dogadjaji = new SelectList(dogadjajiZaComboBox, "Id", "Prikaz");
@@ -84,7 +85,13 @@ namespace EventPlatform.Controllers
                     {
                         StrucniDogadjajID = p.StrucniDogadjajID,
                         Naziv = pronadjenDogadjaj?.Naziv ?? "Nepoznat događaj", 
-                        Agenda = pronadjenDogadjaj?.Agenda ?? ""
+                        Agenda = pronadjenDogadjaj?.Agenda ?? "",
+                        DatumVremeOdrzavanja = pronadjenDogadjaj?.DatumVremeOdrzavanja ?? DateTime.MinValue,
+                        Lokacija = pronadjenDogadjaj?.Lokacija != null ? new Models.Lokacija.LokacijaViewModel
+                        {
+                            Naziv = pronadjenDogadjaj.Lokacija.Naziv,
+                            Adresa = pronadjenDogadjaj.Lokacija.Adresa
+                        } : null
                     },
 
                     Predavaci = pronadjenDogadjaj?.Predavaci?.Select(pred => new PredavacViewModel
@@ -96,6 +103,46 @@ namespace EventPlatform.Controllers
             }).ToList();
 
             return View(listaPrijava);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int ucesnikId, int dogadjajId)
+        {
+            var client = _httpClientFactory.CreateClient("PrijaveAPI");
+
+            var prijava = await client.GetFromJsonAsync<PrijavaDTO>($"/Prijave/{ucesnikId}/{dogadjajId}");
+
+            if(prijava == null)
+            {
+                return NotFound();
+            }
+
+            var model = new PrijavaCreateViewModel
+            {
+                UcesnikID = prijava.Ucesnik.UcesnikID, 
+                StrucniDogadjajID = prijava.StrucniDogadjajID,
+                Ime = prijava.Ucesnik.Ime,
+                Prezime = prijava.Ucesnik.Prezime,
+                Email = prijava.Ucesnik.Email
+            };
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(PrijavaCreateViewModel model)
+        {
+            var client = _httpClientFactory.CreateClient("PrijaveAPI");
+
+            var dto = new PrijavaCreateDTO
+            {
+                StrucniDogadjajID = model.StrucniDogadjajID,
+                Ime = model.Ime,
+                Prezime = model.Prezime,
+                Email = model.Email
+            };
+
+            var response = await client.PutAsJsonAsync("/Prijave", dto);
+
+            return RedirectToAction("Index");
+       
         }
     }
 }

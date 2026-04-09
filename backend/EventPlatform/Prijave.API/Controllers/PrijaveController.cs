@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Prijave.API.Data;
 using Prijave.API.Models;
+using System.Runtime.InteropServices;
 
 namespace Prijave.API.Controllers
 {
@@ -60,6 +61,32 @@ namespace Prijave.API.Controllers
             }).ToList();
 
             return Ok(rezultat);
+        }
+        [HttpGet("{ucesnikId}/{dogadjajId}")]
+        public async Task<ActionResult<PrijavaDTO>> GetById(int ucesnikId, int dogadjajId)
+        {
+            var prijava = await _context.Prijave
+                                .Include(p => p.Ucesnik)
+                                .FirstOrDefaultAsync(p => p.UcesnikID == ucesnikId && p.StrucniDogadjajID == dogadjajId);
+
+            if(prijava == null)
+            {
+                return NotFound();
+            }
+
+            var dto = new PrijavaDTO
+            {
+                Ucesnik = new UcesnikDTO
+                {
+                    UcesnikID = prijava.UcesnikID,
+                    Ime = prijava.Ucesnik.Ime,
+                    Prezime = prijava.Ucesnik.Prezime,
+                    Email = prijava.Ucesnik.Email
+                },
+                StrucniDogadjajID = prijava.StrucniDogadjajID
+            };
+
+            return Ok(dto);
         }
     }
 }

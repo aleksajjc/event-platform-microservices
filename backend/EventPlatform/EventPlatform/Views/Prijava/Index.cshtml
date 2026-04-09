@@ -1,4 +1,4 @@
-﻿@using EventPlatform.Models.Prijava
+@using EventPlatform.Models.Prijava
 @model List<PrijavaViewModel>
 
 <h1>Spisak prijava</h1>
@@ -9,7 +9,8 @@
 	<thead>
 		<tr>
 			<th>Učesnik</th>
-			<th>Stručni dogadjaji</th>
+			<th>Stručni događaj</th>
+			<th>Vreme i mesto održavanja</th>
 			<th>Predavači</th>
 		</tr>
 	</thead>
@@ -18,16 +19,31 @@
 		{
 			<tr>
 				<td>
-					@item.Ucesnik.Ime @item.Ucesnik.Prezime @item.Ucesnik.Email
+					<strong>@item.Ucesnik.Ime @item.Ucesnik.Prezime</strong><br />
+					<small>@item.Ucesnik.Email</small>
 				</td>
 
 				<td>
-					@item.Dogadjaj.Naziv
+					<strong>@item.Dogadjaj.Naziv</strong><br />
+					<small>@item.Dogadjaj.Agenda</small>
 				</td>
+
 				<td>
-					@foreach(var predavac in item.Predavaci)
+					@item.Dogadjaj.DatumVremeOdrzavanja.ToString("dd.MM.yyyy HH:mm")<br />
+					<small>@item.Dogadjaj.Lokacija?.Naziv</small>
+				</td>
+
+				<td>
+					@if (item.Predavaci != null && item.Predavaci.Any())
 					{
-						<link @predavac.Ime @predavac.Prezime/>
+						@foreach(var predavac in item.Predavaci)
+						{
+							<span class="badge bg-secondary me-1">@predavac.Ime @predavac.Prezime</span>
+						}
+					}
+					else
+					{
+						<span class="text-muted">Nema predavača</span>
 					}
 				</td>
 			</tr>

@@ -8,6 +8,7 @@ namespace DTO.Prijave
 {
     public class PrijavaCreateDTO
     {
+        public int UcesnikID { get; set; }
         public int StrucniDogadjajID { get; set; }
         public DateTime DatumPrijave { get; set; }
         public string Ime { get; set; }
