@@ -6,6 +6,9 @@ using EventPlatform.Models.Prijava;
 using EventPlatform.Models.Ucesnik;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using RabbitMQ.Client;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace EventPlatform.Controllers
@@ -84,7 +87,7 @@ namespace EventPlatform.Controllers
                     Dogadjaj = new DogadjajViewModel
                     {
                         StrucniDogadjajID = p.StrucniDogadjajID,
-                        Naziv = pronadjenDogadjaj?.Naziv ?? "Nepoznat događaj", 
+                        Naziv = pronadjenDogadjaj?.Naziv ?? "Nepoznat događaj",
                         Agenda = pronadjenDogadjaj?.Agenda ?? "",
                         DatumVremeOdrzavanja = pronadjenDogadjaj?.DatumVremeOdrzavanja ?? DateTime.MinValue,
                         Lokacija = pronadjenDogadjaj?.Lokacija != null ? new Models.Lokacija.LokacijaViewModel
@@ -111,14 +114,14 @@ namespace EventPlatform.Controllers
 
             var prijava = await client.GetFromJsonAsync<PrijavaDTO>($"/Prijave/{ucesnikId}/{dogadjajId}");
 
-            if(prijava == null)
+            if (prijava == null)
             {
                 return NotFound();
             }
 
             var model = new PrijavaCreateViewModel
             {
-                UcesnikID = prijava.Ucesnik.UcesnikID, 
+                UcesnikID = prijava.Ucesnik.UcesnikID,
                 StrucniDogadjajID = prijava.StrucniDogadjajID,
                 Ime = prijava.Ucesnik.Ime,
                 Prezime = prijava.Ucesnik.Prezime,
@@ -142,7 +145,50 @@ namespace EventPlatform.Controllers
             var response = await client.PutAsJsonAsync("/Prijave", dto);
 
             return RedirectToAction("Index");
-       
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> Delete(int ucesnikId, int dogadjajId)
+        {
+            const string host = "localhost";
+            const string username = "guest";
+            const string password = "guest";
+
+            const string exchangeName = "prijave.exchange";
+            const string queueName = "prijave.brisanje.queue";
+            const string routingKey = "prijave.brisanje.routingkey";
+
+            var messageObjekat = new { UcesnikID = ucesnikId, DogadjajID = dogadjajId };
+            string jsonMessage = JsonSerializer.Serialize(messageObjekat);
+            var body = Encoding.UTF8.GetBytes(jsonMessage);
+
+            var factory = new ConnectionFactory
+            {
+                HostName = host,
+                UserName = username,
+                Password = password
+            };
+
+            await using var connection = await factory.CreateConnectionAsync();
+            await using var channel = await connection.CreateChannelAsync();
+
+            await channel.ExchangeDeclareAsync(exchangeName, ExchangeType.Direct, durable: true, autoDelete: false);
+            await channel.QueueDeclareAsync(queueName, durable: true, exclusive: false, autoDelete: false);
+
+            await channel.QueueBindAsync(queueName, exchangeName, routingKey);
+
+            var properties = new BasicProperties
+            {
+                Persistent = true
+            };
+
+            await channel.BasicPublishAsync(
+                exchange: exchangeName,
+                routingKey: routingKey,
+                mandatory: false,
+                basicProperties: properties,
+                body: body);
+            return RedirectToAction("Index");
         }
     }
 }

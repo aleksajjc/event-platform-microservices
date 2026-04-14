@@ -1,4 +1,4 @@
-﻿using DTO.Prijave;
+using DTO.Prijave;
 using DTO.Ucesnici;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +52,7 @@ namespace Prijave.API.Controllers
             {
                 Ucesnik = new UcesnikDTO
                 {
+                   UcesnikID = p.UcesnikID,
                    Ime = p.Ucesnik.Ime,
                    Prezime = p.Ucesnik.Prezime,
                    Email = p.Ucesnik.Email
@@ -88,5 +89,6 @@ namespace Prijave.API.Controllers
 
             return Ok(dto);
         }
+
     }
 }

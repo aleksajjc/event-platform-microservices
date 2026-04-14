@@ -289,5 +289,6 @@ namespace EventPlatform.Controllers
                 return View(new DogadjajViewModel()); 
             }
         }
+
     }
 }

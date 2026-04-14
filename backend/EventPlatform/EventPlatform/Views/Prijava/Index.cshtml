@@ -27,7 +27,7 @@
 					<strong>@item.Dogadjaj.Naziv</strong><br />
 					<small>@item.Dogadjaj.Agenda</small>
 				</td>
-
+				
 				<td>
 					@item.Dogadjaj.DatumVremeOdrzavanja.ToString("dd.MM.yyyy HH:mm")<br />
 					<small>@item.Dogadjaj.Lokacija?.Naziv</small>
@@ -45,6 +45,13 @@
 					{
 						<span class="text-muted">Nema predavača</span>
 					}
+				</td>
+				<td>
+					<form asp-action="Delete" asp-controller="Prijava" method="post" style="display:inline;">
+						<input type="hidden" name="ucesnikId" value="@item.Ucesnik.UcesnikID" />
+						<input type="hidden" name="dogadjajId" value="@item.Dogadjaj.StrucniDogadjajID" />
+						<button type="submit" class="btn btn-sm btn-danger">Izbriši</button>
+					</form>
 				</td>
 			</tr>
 		}
