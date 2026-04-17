@@ -13,6 +13,7 @@ namespace Events.API.Data
         public DbSet<Predavac> Predavaci { get; set; }
         public DbSet<StrucniDogadjaj> StrucniDogadjaji { get; set; }
         public DbSet<TipDogadjaja> TipoviDogadjaja { get; set; }
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
