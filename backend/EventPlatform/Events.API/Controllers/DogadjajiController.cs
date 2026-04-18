@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace Events.API.Controllers
 {
@@ -81,24 +83,51 @@ namespace Events.API.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Create(StrucniDogadjajCreateDTO request)
         {
-            var noviDogadjaj = new StrucniDogadjaj
+            await using var transakcija = await Context.Database.BeginTransactionAsync();
+
+            try
             {
-                Naziv = request.Naziv,
-                Agenda = request.Agenda,
-                DatumVremeOdrzavanja = request.DatumVremeOdrzavanja,
-                Trajanje = request.Trajanje,
-                CenaKotizacije = request.CenaKotizacije,
-                LokacijaID = request.LokacijaID,
-                Predavaci = Context.Predavaci
-                    .Where(p => request.PredavaciIDs.Contains(p.PredavacID))
-                    .ToList(),
-                TipDogadjajaID = request.TipDogadjajaID
-            };
+                var noviDogadjaj = new StrucniDogadjaj
+                {
+                    Naziv = request.Naziv,
+                    Agenda = request.Agenda,
+                    DatumVremeOdrzavanja = request.DatumVremeOdrzavanja,
+                    Trajanje = request.Trajanje,
+                    CenaKotizacije = request.CenaKotizacije,
+                    LokacijaID = request.LokacijaID,
+                    Predavaci = Context.Predavaci
+                            .Where(p => request.PredavaciIDs.Contains(p.PredavacID))
+                            .ToList(),
+                    TipDogadjajaID = request.TipDogadjajaID
+                };
 
-            Context.Add(noviDogadjaj);
-            await Context.SaveChangesAsync();
+                Context.Add(noviDogadjaj);
+                await Context.SaveChangesAsync();
 
-            return Ok(noviDogadjaj.StrucniDogadjajID);
+                var porukaPayload = JsonSerializer.Serialize(new
+                {
+                    StrucniDogadjajID = noviDogadjaj.StrucniDogadjajID,
+                    Naziv = noviDogadjaj.Naziv
+                });
+
+                var outboxMessage = new OutboxMessage
+                {
+                    EventType = "DogadjajKreiran",
+                    Payload = porukaPayload,
+                    CreatedAt = DateTime.UtcNow
+                };
+                Context.OutboxMessages.Add(outboxMessage);
+                await Context.SaveChangesAsync();
+
+                await transakcija.CommitAsync();
+
+                return Ok(noviDogadjaj.StrucniDogadjajID);
+            }
+            catch (Exception)
+            {
+                await transakcija.RollbackAsync();
+                return BadRequest();
+            }
         }
 
         [HttpGet("{id}")]

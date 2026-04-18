@@ -1,5 +1,6 @@
 
 using Events.API.Data;
+using Events.API.HostedServices;
 
 namespace Events.API
 {
@@ -18,6 +19,10 @@ namespace Events.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
+            builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+            builder.Services.AddHostedService<DogadjajOutboxPublisher>();
 
             var app = builder.Build();
 
