@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Prijave.API.Background_services;
 using Prijave.API.Data;
+using Prijave.API.HostedServices;
 
 namespace Prijave.API
 {
@@ -17,6 +18,8 @@ namespace Prijave.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddHostedService<DeleteConsumer>();
+            builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
+            builder.Services.AddHostedService<DogadjajCreatedConsumer>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

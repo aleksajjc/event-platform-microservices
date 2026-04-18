@@ -10,6 +10,8 @@ namespace Prijave.API.Data
         }
         public DbSet<Ucesnik> Ucesnici { get; set; }
         public DbSet<Prijava> Prijave { get; set; }
+        public DbSet<DogadjajReference> DogadjajReferences { get; set; }
+        public DbSet<ProcessedMessage> ProcessedMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

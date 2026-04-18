@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prijave.API.Data;
 
@@ -11,9 +12,11 @@ using Prijave.API.Data;
 namespace Prijave.API.Migrations
 {
     [DbContext(typeof(PrijavaContext))]
-    partial class PrijavaContextModelSnapshot : ModelSnapshot
+    [Migration("20260418121915_UpdatedReferenceKey")]
+    partial class UpdatedReferenceKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

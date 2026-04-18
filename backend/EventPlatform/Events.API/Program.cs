@@ -23,7 +23,7 @@ namespace Events.API
             builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
             builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
             builder.Services.AddHostedService<DogadjajOutboxPublisher>();
-
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

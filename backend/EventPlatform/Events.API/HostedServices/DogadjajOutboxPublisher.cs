@@ -47,6 +47,7 @@ namespace Events.API.HostedServices
                     {
                         _logger.LogError(ex, "Unexpected outbox publishing error.");
                     }
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                 }
             }
         }
