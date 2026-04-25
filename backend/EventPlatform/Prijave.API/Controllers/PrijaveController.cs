@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Prijave.API.Data;
+using Prijave.API.HostedServices;
 using Prijave.API.Models;
 using System.Runtime.InteropServices;
 
@@ -14,9 +15,11 @@ namespace Prijave.API.Controllers
     public class PrijaveController : ControllerBase
     {
         public PrijavaContext _context { get; set; }
-        public PrijaveController(PrijavaContext context)
+        private readonly DogadjajDetaljiClient _klijent;
+        public PrijaveController(PrijavaContext context, DogadjajDetaljiClient klijent)
         {
             _context = context;
+            _klijent = klijent;
         }
 
 
@@ -39,6 +42,16 @@ namespace Prijave.API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok($"{novaPrijava.UcesnikID} {novaPrijava.StrucniDogadjajID}");
+        }
+
+        [HttpPost("TestirajRequestReply/{dogadjajId}")]
+        public async Task<IActionResult> TestirajRequestReply(int dogadjajId)
+        {
+            var zahtev = new DogadjajDetaljiRequest(dogadjajId);
+
+            await _klijent.PosaljiZahtevAsync(zahtev);
+
+            return Ok("Zahtev poslat! Pogledaj obe crne konzole (Events i Prijave) da pratiš šta se dešava!");
         }
 
         [HttpGet]

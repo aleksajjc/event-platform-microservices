@@ -9,5 +9,7 @@
         public string Exchange { get; set; } = "dogadjaji.exchange";
         public string Queue { get; set; } = "dogadjaji.kreiranje.queue";
         public string RoutingKey { get; set; } = "dogadjaji.kreiranje.routingkey";
+        public string RequestQueue { get; set; } = "dogadjaji.detalji.request";
+        public string ReplyQueue { get; set; } = "dogadjaji.detalji.reply";
     }
 }

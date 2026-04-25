@@ -20,6 +20,8 @@ namespace Prijave.API
             builder.Services.AddHostedService<DeleteConsumer>();
             builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
             builder.Services.AddHostedService<DogadjajCreatedConsumer>();
+            builder.Services.AddSingleton<DogadjajDetaljiClient>();
+            builder.Services.AddHostedService(provider => provider.GetRequiredService<DogadjajDetaljiClient>());
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
