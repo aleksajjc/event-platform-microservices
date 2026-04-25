@@ -1,4 +1,4 @@
-﻿
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Prijave.API.Data;
@@ -27,6 +27,8 @@ namespace Prijave.API.HostedServices
             _logger = logger;
         }
 
+        private readonly Dictionary<string, int> retryCounts = new ();
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var factory = new ConnectionFactory
@@ -40,19 +42,35 @@ namespace Prijave.API.HostedServices
             connection = await factory.CreateConnectionAsync(stoppingToken);
             channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
 
+            
+            var dlxExchangeName = "prijave.dlx";
+            var dlqQueueName = "prijave.dead.queue";
+
+            await channel.ExchangeDeclareAsync(dlxExchangeName, ExchangeType.Direct, durable: true, autoDelete: false, cancellationToken: stoppingToken);
+            await channel.QueueDeclareAsync(dlqQueueName, durable: true, exclusive: false, autoDelete: false, cancellationToken: stoppingToken);
+            await channel.QueueBindAsync(dlqQueueName, dlxExchangeName, "dlq.routing.key", cancellationToken: stoppingToken);
+            
             await channel.ExchangeDeclareAsync(
                 exchange: _options.Exchange,
                 type: ExchangeType.Direct, 
                 durable: true, 
                 autoDelete: false, 
                 cancellationToken: stoppingToken);
+
+            var glavniRedArgumenti = new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", dlxExchangeName },
+                { "x-dead-letter-routing-key", "dlq.routing.key" }
+            };
+
             await channel.QueueDeclareAsync(
                 queue: _options.Queue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null,
+                arguments: glavniRedArgumenti,
                 cancellationToken: stoppingToken);
+
             await channel.QueueBindAsync(
                 queue: _options.Queue, 
                 exchange: _options.Exchange, 
@@ -84,6 +102,8 @@ namespace Prijave.API.HostedServices
             if (channel is null) return;
             try
             {
+                //throw new Exception("Baza je trenutno nedostupna, simulacija pada!");
+
                 using var scope = _scopeFactory.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<PrijavaContext>();
 
@@ -112,11 +132,33 @@ namespace Prijave.API.HostedServices
                     await tx.CommitAsync(cancellationToken);
                 }
                 await channel.BasicAckAsync(ea.DeliveryTag, multiple: false, cancellationToken: cancellationToken);
+                
+                var porukaId = ea.BasicProperties.MessageId ?? "nepoznat_id";
+                retryCounts.Remove(porukaId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Krah pri obradi mreze!");
-                await channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true, cancellationToken: cancellationToken);
+                var porukaId = ea.BasicProperties.MessageId ?? "nepoznat_id";
+                _logger.LogError(ex, "Greska pri obradi mreze! MessageId: {id}", porukaId);
+
+                if (!retryCounts.ContainsKey(porukaId))
+                    retryCounts[porukaId] = 1;
+                else
+                    retryCounts[porukaId]++;
+
+                int trenutniPokusaj = retryCounts[porukaId];
+
+                if (trenutniPokusaj >= 5)
+                {
+                    _logger.LogWarning("Poruka {id} pala 5 puta! Baca se u Dead Letter Queue!", porukaId);
+                    await channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: false, cancellationToken: cancellationToken);
+                    retryCounts.Remove(porukaId);
+                }
+                else
+                {
+                    _logger.LogInformation("Pokusaj {broj}/5. Vracam poruku nazad u red...", trenutniPokusaj);
+                    await channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true, cancellationToken: cancellationToken);
+                }
             }
         }
 

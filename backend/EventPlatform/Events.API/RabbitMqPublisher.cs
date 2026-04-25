@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System.Text;
 using System.Threading.Channels;
@@ -83,12 +83,18 @@ namespace Events.API
                     autoDelete: false,
                     cancellationToken: cancellationToken);
 
+                var glavniRedArgumenti = new Dictionary<string, object>
+                {
+                    { "x-dead-letter-exchange", "prijave.dlx" },
+                    { "x-dead-letter-routing-key", "dlq.routing.key" }
+                };
+
                 await channel.QueueDeclareAsync(
                     queue: _options.Queue,
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
-                    arguments: null,
+                    arguments: glavniRedArgumenti,
                     cancellationToken: cancellationToken); 
 
                 await channel.QueueBindAsync(
