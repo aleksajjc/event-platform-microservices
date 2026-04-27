@@ -12,5 +12,6 @@
         public ushort PrefetchCount { get; set; } = 1;
         public string RequestQueue { get; set; } = "dogadjaji.detalji.request";
         public string ReplyQueue { get; set; } = "dogadjaji.detalji.reply";
+        public string EmailQueue { get; set; } = "email.slanje.queue";
     }
 }
