@@ -22,6 +22,8 @@ namespace Prijave.API
             builder.Services.AddHostedService<DogadjajCreatedConsumer>();
             builder.Services.AddSingleton<DogadjajDetaljiClient>();
             builder.Services.AddHostedService(provider => provider.GetRequiredService<DogadjajDetaljiClient>());
+            builder.Services.AddScoped<EmailPublisher>();
+            builder.Services.AddHostedService<EmailRateLimiterConsumer>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

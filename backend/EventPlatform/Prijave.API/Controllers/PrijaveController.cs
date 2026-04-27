@@ -3,6 +3,7 @@ using DTO.Ucesnici;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Prijave.API.Background_services;
 using Prijave.API.Data;
 using Prijave.API.HostedServices;
 using Prijave.API.Models;
@@ -16,10 +17,12 @@ namespace Prijave.API.Controllers
     {
         public PrijavaContext _context { get; set; }
         private readonly DogadjajDetaljiClient _klijent;
-        public PrijaveController(PrijavaContext context, DogadjajDetaljiClient klijent)
+        private readonly EmailPublisher _emailPublisher;
+        public PrijaveController(PrijavaContext context, DogadjajDetaljiClient klijent, EmailPublisher emailPublisher)
         {
             _context = context;
             _klijent = klijent;
+            _emailPublisher = emailPublisher;
         }
 
 
@@ -42,6 +45,16 @@ namespace Prijave.API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok($"{novaPrijava.UcesnikID} {novaPrijava.StrucniDogadjajID}");
+        }
+        [HttpPost("TestirajEmail")]
+        public async Task<IActionResult> TestirajEmail()
+        {
+            for (int i = 1; i <= 13; i++)
+            {
+                var mejl = new EmailMessage($"{i}@gmail.com", $"Potvrda prijave #{i}", $"Tekst:{i}");
+                await _emailPublisher.PosaljiEmailNaQueue(mejl);
+            }
+            return Ok("12 mejlova poslato u Queue! Pogledaj konzolu i outbox folder.");
         }
 
         [HttpPost("TestirajRequestReply/{dogadjajId}")]
