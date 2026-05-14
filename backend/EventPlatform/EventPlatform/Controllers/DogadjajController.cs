@@ -137,7 +137,7 @@ namespace EventPlatform.Controllers
             }
             catch(HttpRequestException ex)
             {
-                ViewBag.ExceptionMessage = "Ne mo�emo u�itati dogadjaje, dostignut je maksimalan broj poku�aja";
+                ViewBag.ExceptionMessage = "Ne mozemo ucitati dogadjaje, dostignut je maksimalan broj pokusaja";
                 return View(new List<DogadjajViewModel>());
             }
 
