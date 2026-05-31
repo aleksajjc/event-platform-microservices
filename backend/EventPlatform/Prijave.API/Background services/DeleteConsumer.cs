@@ -87,7 +87,7 @@ namespace Prijave.API.Background_services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[RABBITMQ EROOR] Izuzetak tokom brisanja: {ex.Message}");
+                    Console.WriteLine($"[RABBITMQ EROR] Izuzetak tokom brisanja: {ex.Message}");
                     Console.WriteLine(ex.StackTrace);
                     await channel.BasicRejectAsync(eventArgs.DeliveryTag, requeue: false);
                 }

@@ -22,7 +22,7 @@ namespace Events.API
 
             builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
             builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
-            builder.Services.AddHostedService<DogadjajOutboxPublisher>();
+            //builder.Services.AddHostedService<DogadjajOutboxPublisher>();
             builder.Services.AddHostedService<DogadjajDetaljiProcessorService>();
             var app = builder.Build();
 

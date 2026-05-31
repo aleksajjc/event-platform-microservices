@@ -30,7 +30,7 @@ namespace Events.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StrucniDogadjajDTO>>> Get()
         {
-            //Testiranje timeout-a await Task.Delay(15000);
+           //Testiranje timeout-a await Task.Delay(15000);
             _counter++;
             logger.LogInformation($"[Events API] Zahtev broj: {_counter}");
 
