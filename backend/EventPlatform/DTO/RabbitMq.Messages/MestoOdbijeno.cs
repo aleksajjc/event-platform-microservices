@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DTO.RabbitMq.Messages
 {
-    internal class MestoOdbijeno
+    public class MestoOdbijeno
     {
+        public int CorrelationID { get; set; }
+        public string Razlog { get; set; }
     }
 }

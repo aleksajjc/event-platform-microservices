@@ -6,5 +6,7 @@
         public Ucesnik Ucesnik { get; set; }
         public int StrucniDogadjajID { get; set; }
         public DateTime DatumPrijave { get; set; }
+        public StatusPrijava StatusPrijava { get; set; }
+        public Guid CorrelationID { get; set; }
     }
 }

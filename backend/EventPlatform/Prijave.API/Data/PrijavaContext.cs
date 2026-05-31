@@ -13,6 +13,8 @@ namespace Prijave.API.Data
         public DbSet<DogadjajReference> DogadjajReferences { get; set; }
         public DbSet<ProcessedMessage> ProcessedMessages { get; set; }
 
+        public DbSet<PrijavaZapocetaOutboxMessage> PrijavaZapocetaOutboxMessages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -25,6 +27,9 @@ namespace Prijave.API.Data
                 .WithMany(u => u.Prijave)
                 .HasForeignKey(p => p.UcesnikID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrijavaZapocetaOutboxMessage>()
+                .HasKey(pz => pz.ID);
         }
     }
 }

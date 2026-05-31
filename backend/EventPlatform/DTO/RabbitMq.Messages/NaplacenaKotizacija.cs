@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace DTO.RabbitMq.Messages
 {
-    publi class NaplacenaKotizacija
+    public class NaplacenaKotizacija
     {
+        public int CorrelationID { get; set; }
     }
 }

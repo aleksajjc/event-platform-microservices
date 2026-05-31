@@ -8,6 +8,6 @@ namespace DTO.RabbitMq.Messages
 {
     public class MestoRezervisano
     {
-        p
+        public int CorrelationID { get; set; }
     }
 }

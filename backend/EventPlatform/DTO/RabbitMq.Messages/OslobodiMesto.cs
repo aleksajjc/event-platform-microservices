@@ -8,6 +8,7 @@ namespace DTO.RabbitMq.Messages
 {
     public class OslobodiMesto
     {
-
+        public int CorrelationID { get; set; }
+        public int StrucniDogadjajID { get; set; }
     }
 }
