@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,6 @@ namespace DTO.RabbitMq.Messages
 {
     public class MestoRezervisano
     {
-        public int CorrelationID { get; set; }
+        public Guid CorrelationID { get; set; }
     }
 }
