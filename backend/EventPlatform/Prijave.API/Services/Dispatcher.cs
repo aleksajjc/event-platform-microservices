@@ -1,5 +1,5 @@
-﻿
-using DTO.Saga;
+
+using DTO.RabbitMq.Messages;
 using Microsoft.EntityFrameworkCore;
 using Prijave.API.Data;
 using Prijave.API.Models;
@@ -38,7 +38,7 @@ namespace Prijave.API.Services
                                     StrucniDogadjajID = prijava.StrucniDogadjajID,
                                     UcesnikID = prijava.UcesnikID,
                                     Email = prijava.Ucesnik.Email,
-                                    CenaKotizacije = 0 
+                                    CenaKotizacije = prijava.CenaKotizacije 
                                 };
                                 using var bus = new RabbitMqBus();
                                 await bus.Publish("prijava-zapoceta", JsonSerializer.Serialize(prijavaZapoceta));
@@ -48,7 +48,7 @@ namespace Prijave.API.Services
                                 dbContext.Update(outboxMessage);
                                 await dbContext.SaveChangesAsync(stoppingToken);
 
-                                Console.WriteLine($"[PRIJAVE-DISPATCHER] Poslata poruka prijava-zapoceta za CorrelationId: {prijava.CorrelationId}");
+                                Console.WriteLine($"[PRIJAVE-DISPATCHER] Poslata poruka prijava-zapoceta za CorrelationId: {prijava.CorrelationID}");
                             }
                         }
                     }

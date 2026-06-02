@@ -1,4 +1,4 @@
-﻿namespace Prijave.API.Models
+namespace Prijave.API.Models
 {
     public class Prijava
     {
@@ -8,5 +8,6 @@
         public DateTime DatumPrijave { get; set; }
         public StatusPrijava StatusPrijava { get; set; }
         public Guid CorrelationID { get; set; }
+        public double CenaKotizacije { get; set; }
     }
 }

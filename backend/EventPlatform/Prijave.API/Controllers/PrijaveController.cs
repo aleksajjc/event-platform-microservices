@@ -29,6 +29,7 @@ namespace Prijave.API.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Create(PrijavaCreateDTO request)
         {
+            var correlationId = Guid.NewGuid();
             var novaPrijava = new Prijava
             {
                 Ucesnik = new Ucesnik
@@ -38,10 +39,21 @@ namespace Prijave.API.Controllers
                     Email = request.Email
                 },
                 StrucniDogadjajID = request.StrucniDogadjajID,
-                DatumPrijave = request.DatumPrijave
+                DatumPrijave = request.DatumPrijave,
+                StatusPrijava = StatusPrijava.NaCekanju,
+                CorrelationID = correlationId,
+                CenaKotizacije = request.CenaKotizacije
+            };
+
+            var outboxMessage = new PrijavaZapocetaOutboxMessage
+            {
+                CorrelationId = correlationId,
+                Status = OutboxMessageStatus.ForProcessing,
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Prijave.Add(novaPrijava);
+            _context.PrijavaZapocetaOutboxMessages.Add(outboxMessage);
             await _context.SaveChangesAsync();
 
             return Ok($"{novaPrijava.UcesnikID} {novaPrijava.StrucniDogadjajID}");
@@ -64,7 +76,7 @@ namespace Prijave.API.Controllers
 
             await _klijent.PosaljiZahtevAsync(zahtev);
 
-            return Ok("Zahtev poslat! Pogledaj obe crne konzole (Events i Prijave) da pratiö öta se deöava!");
+            return Ok("Zahtev poslat! Pogledaj obe crne konzole (Events i Prijave) da pratite ≈°ta se de≈°ava!");
         }
 
         [HttpGet]
@@ -84,7 +96,9 @@ namespace Prijave.API.Controllers
                    Email = p.Ucesnik.Email
                 },
                 StrucniDogadjajID = p.StrucniDogadjajID,
-                DatumPrijave = p.DatumPrijave
+                DatumPrijave = p.DatumPrijave,
+                StatusPrijava = p.CorrelationID == Guid.Empty ? "Potvrdjena" : p.StatusPrijava.ToString(),
+                CorrelationID = p.CorrelationID
             }).ToList();
 
             return Ok(rezultat);
@@ -110,7 +124,10 @@ namespace Prijave.API.Controllers
                     Prezime = prijava.Ucesnik.Prezime,
                     Email = prijava.Ucesnik.Email
                 },
-                StrucniDogadjajID = prijava.StrucniDogadjajID
+                StrucniDogadjajID = prijava.StrucniDogadjajID,
+                DatumPrijave = prijava.DatumPrijave,
+                StatusPrijava = prijava.CorrelationID == Guid.Empty ? "Potvrdjena" : prijava.StatusPrijava.ToString(),
+                CorrelationID = prijava.CorrelationID
             };
 
             return Ok(dto);

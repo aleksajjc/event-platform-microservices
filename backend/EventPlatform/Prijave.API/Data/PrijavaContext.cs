@@ -30,6 +30,10 @@ namespace Prijave.API.Data
 
             modelBuilder.Entity<PrijavaZapocetaOutboxMessage>()
                 .HasKey(pz => pz.ID);
+
+            modelBuilder.Entity<PrijavaZapocetaOutboxMessage>()
+                .Property(pz => pz.Status)
+                .HasConversion<string>();
         }
     }
 }

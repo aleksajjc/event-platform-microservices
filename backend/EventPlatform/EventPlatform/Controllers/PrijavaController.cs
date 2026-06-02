@@ -42,7 +42,28 @@ namespace EventPlatform.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(PrijavaCreateViewModel model)
         {
-            var client = _httpClientFactory.CreateClient("PrijaveAPI");
+            var clientPrijave = _httpClientFactory.CreateClient("PrijaveAPI");
+            var clientEvents = _httpClientFactory.CreateClient("EventsAPI");
+
+            double cena = 0.0;
+            int retries = 10;
+            for (int i = 0; i < retries; i++)
+            {
+                try
+                {
+                    var dogadjaj = await clientEvents.GetFromJsonAsync<StrucniDogadjajDTO>($"/Dogadjaji/{model.StrucniDogadjajID}");
+                    if (dogadjaj != null)
+                    {
+                        cena = dogadjaj.CenaKotizacije;
+                        break;
+                    }
+                }
+                catch (Exception)
+                {
+                    if (i == retries - 1) throw;
+                    await Task.Delay(200);
+                }
+            }
 
             var novaPrijava = new PrijavaCreateDTO
             {
@@ -50,10 +71,11 @@ namespace EventPlatform.Controllers
                 DatumPrijave = DateTime.UtcNow,
                 Ime = model.Ime,
                 Prezime = model.Prezime,
-                Email = model.Email
+                Email = model.Email,
+                CenaKotizacije = cena
             };
 
-            var response = await client.PostAsJsonAsync("/Prijave", novaPrijava);
+            var response = await clientPrijave.PostAsJsonAsync("/Prijave", novaPrijava);
 
             if (response.IsSuccessStatusCode)
             {
@@ -101,7 +123,10 @@ namespace EventPlatform.Controllers
                     {
                         Ime = pred.Ime,
                         Prezime = pred.Prezime
-                    }).ToList() ?? new List<PredavacViewModel>()
+                    }).ToList() ?? new List<PredavacViewModel>(),
+
+                    StatusPrijava = p.StatusPrijava,
+                    CorrelationID = p.CorrelationID
                 };
             }).ToList();
 

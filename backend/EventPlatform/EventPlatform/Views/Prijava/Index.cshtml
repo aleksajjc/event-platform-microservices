@@ -12,6 +12,9 @@
 			<th>Stručni događaj</th>
 			<th>Vreme i mesto održavanja</th>
 			<th>Predavači</th>
+			<th>Status</th>
+			<th>Saga Correlation ID</th>
+			<th>Akcije</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -46,6 +49,39 @@
 						<span class="text-muted">Nema predavača</span>
 					}
 				</td>
+
+				<td>
+					@if (item.StatusPrijava == "NaCekanju")
+					{
+						<span class="badge bg-warning text-dark">Na čekanju (Saga)</span>
+					}
+					else if (item.StatusPrijava == "Potvrdjena")
+					{
+						<span class="badge bg-success">Potvrđena</span>
+					}
+					else if (item.StatusPrijava == "Otkazana")
+					{
+						<span class="badge bg-danger">Otkazana / Odbijena</span>
+					}
+					else
+					{
+						<span class="badge bg-secondary">@item.StatusPrijava</span>
+					}
+				</td>
+
+				<td>
+					@if (item.CorrelationID == Guid.Empty)
+					{
+						<span class="text-muted">-</span>
+					}
+					else
+					{
+						<span class="badge bg-light text-secondary border" title="@item.CorrelationID" style="font-family: monospace;">
+							@item.CorrelationID.ToString().Substring(0, 8)...
+						</span>
+					}
+				</td>
+
 				<td>
 					<form asp-action="Delete" asp-controller="Prijava" method="post" style="display:inline;">
 						<input type="hidden" name="ucesnikId" value="@item.Ucesnik.UcesnikID" />
