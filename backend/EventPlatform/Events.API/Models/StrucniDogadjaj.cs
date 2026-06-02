@@ -1,4 +1,4 @@
-﻿namespace Events.API.Models
+namespace Events.API.Models
 {
     public class StrucniDogadjaj
     {
@@ -13,5 +13,7 @@
         public List<Predavac> Predavaci { get; set; }
         public TipDogadjaja TipDogadjaja { get; set; }
         public int TipDogadjajaID { get; set; }
+        public int MaksimalanKapacitet { get; set; }
+        public int SlobodnaMesta { get; set; }
     }
 }
