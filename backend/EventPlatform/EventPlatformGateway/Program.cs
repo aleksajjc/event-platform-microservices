@@ -5,11 +5,12 @@ using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using System.Text;
 using Ocelot.Cache.CacheManager;
+using Ocelot.Middleware;
 namespace EventPlatformGateway
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,6 @@ namespace EventPlatformGateway
                                 };
                             });
 
-            // Ocelot + response cache.
             builder.Services
                 .AddOcelot(builder.Configuration)
                 .AddCacheManager(x => x.WithDictionaryHandle());
@@ -66,11 +66,25 @@ namespace EventPlatformGateway
 
             app.UseMiddleware<RequestSecurityMiddleware>();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
+            var pipeline = new OcelotPipelineConfiguration
+            {
+                AuthorizationMiddleware = async (context, next) =>
+                {
+                    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+                    logger.LogInformation("Custom Authorization Middleware se izvrsava");
+                    await next.Invoke();
+                }
+            };
+
+            await app.UseOcelot(pipeline);
 
             app.MapControllers();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

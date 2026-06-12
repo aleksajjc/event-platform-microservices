@@ -13,7 +13,6 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // Zabrana sumnjivih putanja.
             if (context.Request.Path.Value?.Contains("..", StringComparison.Ordinal) == true)
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -21,7 +20,6 @@
                 return;
             }
 
-            // Za sve mutirajuće zahteve tražimo dodatni header.
             if ((HttpMethods.IsPost(context.Request.Method) ||
                  HttpMethods.IsPut(context.Request.Method) ||
                  HttpMethods.IsDelete(context.Request.Method) ||
@@ -33,7 +31,6 @@
                 return;
             }
 
-            // Gruba zaštita od prevelikih body-ja.
             if (context.Request.ContentLength is > 5_000_000)
             {
                 context.Response.StatusCode = StatusCodes.Status413PayloadTooLarge;
@@ -48,4 +45,4 @@
         }
     }
 }
-}
+
