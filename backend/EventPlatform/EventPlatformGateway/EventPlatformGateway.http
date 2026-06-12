@@ -1,0 +1,6 @@
+@EventPlatformGateway_HostAddress = http://localhost:5071
+
+GET {{EventPlatformGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
