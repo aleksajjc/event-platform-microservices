@@ -15,14 +15,16 @@ namespace EventPlatform
             builder.Services.AddHttpClient("EventsAPI", (client) =>
             {
                 client.Timeout = TimeSpan.FromSeconds(10);
-
+                client.DefaultRequestHeaders.Add("X-Request-Source", "MVC-Frontend");
+                client.DefaultRequestHeaders.Add("X-Client-Id", "MVC-Client");
                 client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("EventsAPIEndPoint")!);
             });
 
             builder.Services.AddHttpClient("PrijaveAPI", (client) =>
             {
                 client.Timeout = TimeSpan.FromSeconds(10);
-
+                client.DefaultRequestHeaders.Add("X-Request-Source", "MVC-Frontend");
+                client.DefaultRequestHeaders.Add("X-Client-Id", "MVC-Client");
                 client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("PrijaveAPIEndPoint")!);
             });
 
