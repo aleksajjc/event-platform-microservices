@@ -1,5 +1,7 @@
 
 using Events.API.Data;
+using Events.API.CQRS.Handlers;
+using Events.API.CQRS.Repositories;
 using Events.API.HostedServices;
 
 namespace Events.API
@@ -22,9 +24,17 @@ namespace Events.API
 
             builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
             builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
-            builder.Services.AddHostedService<DogadjajOutboxPublisher>();
+            //builder.Services.AddHostedService<DogadjajOutboxPublisher>();
             builder.Services.AddHostedService<DogadjajDetaljiProcessorService>();
             builder.Services.AddHostedService<Events.API.HostedServices.SagaCommandConsumer>();
+
+            builder.Services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(GetAllDogadjajQueryHandler).Assembly);
+            });
+
+            builder.Services.AddTransient<IDogadjajReadRepository, DogadjajReadRepository>();
+            builder.Services.AddTransient<IDogadjajWriteRepository, DogadjajWriteRepository>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
