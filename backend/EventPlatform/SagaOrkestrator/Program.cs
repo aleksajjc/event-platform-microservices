@@ -17,18 +17,18 @@ namespace SagaOrkestrator
             Console.Title = "- SAGA ORKESTRATOR CONSOLE -";
             Console.WriteLine("[SAGA] Pokretanje Saga Orkestratora...");
 
-            // Osiguravamo da baza i sve tabele za orkestraciju postoje
+            
             using (var db = new SagaDbContext())
             {
                 db.Database.EnsureCreated();
             }
 
-            // Pokrećemo pozadinski Dispatcher za outbox tabelu
+            
             _ = Task.Run(() => Dispatcher.DispatchOutboxMessages());
 
             using var bus = new RabbitMqBus();
 
-            // 1. PrijavaZapoceta -> Započinjemo sagu, upisujemo u outbox komandu za rezervaciju
+            
             await bus.Subscribe<PrijavaZapoceta>("prijava-zapoceta", async (evt) =>
             {
                 Console.WriteLine($"[SAGA] Primljen događaj prijava-zapoceta. CorrelationId: {evt.CorrelationID}");
@@ -96,7 +96,7 @@ namespace SagaOrkestrator
                         return;
                     }
 
-                    // Kreiramo komandu za naplatu
+                    
                     var naplatiCmd = new NaplatiKotizaciju
                     {
                         CorrelationID = evt.CorrelationID,
@@ -124,7 +124,7 @@ namespace SagaOrkestrator
                 }
             });
 
-            // 3. MestoOdbijeno -> Nema mesta, otkazujemo prijavu (kompenzacija)
+            
             await bus.Subscribe<MestoOdbijeno>("mesto-odbijeno", async (evt) =>
             {
                 Console.WriteLine($"[SAGA] Primljen događaj mesto-odbijeno. Razlog: {evt.Razlog}. CorrelationId: {evt.CorrelationID}");
@@ -142,7 +142,7 @@ namespace SagaOrkestrator
                     sagaState.Greska = evt.Razlog;
                     db.SagaStates.Update(sagaState);
 
-                    // Šaljemo komandu za otkazivanje prijave na Prijave.API
+                    
                     var otkaziCmd = new OtkaziPrijavu
                     {
                         CorrelationID = evt.CorrelationID
@@ -168,7 +168,7 @@ namespace SagaOrkestrator
                 }
             });
 
-            // 4. KotizacijaNaplacena -> Uspešno naplaćeno, potvrđujemo prijavu
+            
             await bus.Subscribe<NaplacenaKotizacija>("kotizacija-naplacena", async (evt) =>
             {
                 Console.WriteLine($"[SAGA] Primljen događaj kotizacija-naplacena. CorrelationId: {evt.CorrelationID}");
@@ -183,7 +183,7 @@ namespace SagaOrkestrator
                         return;
                     }
 
-                    // Šaljemo komandu za potvrdu prijave na Prijave.API
+                    
                     var potvrdiCmd = new PotvrdiPrijavu
                     {
                         CorrelationID = evt.CorrelationID

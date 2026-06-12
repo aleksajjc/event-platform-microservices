@@ -19,7 +19,7 @@ namespace Events.API.HostedServices
         {
             using var bus = new RabbitMqBus();
 
-            // Slušamo komandu za rezervaciju mesta
+            
             await bus.Subscribe<RezervisiMesto>("rezervisi-mesto", async (cmd) =>
             {
                 Console.WriteLine($"[EVENTS-SAGA] Primljena komanda RezervisiMesto za CorrelationId: {cmd.CorrelationID}, DogadjajID: {cmd.StrucniDogadjajID}");
@@ -80,7 +80,7 @@ namespace Events.API.HostedServices
                 }
             });
 
-            // Slušamo komandu za kompenzaciju (oslobađanje mesta)
+            
             await bus.Subscribe<OslobodiMesto>("oslobodi-mesto", async (cmd) =>
             {
                 Console.WriteLine($"[EVENTS-SAGA] Primljena kompenzaciona komanda OslobodiMesto za CorrelationId: {cmd.CorrelationID}, DogadjajID: {cmd.StrucniDogadjajID}");
@@ -94,7 +94,7 @@ namespace Events.API.HostedServices
 
                     if (dogadjaj != null)
                     {
-                        // Oslobađamo mesto i pazimo da ne premašimo maksimalni kapacitet
+                        
                         if (dogadjaj.SlobodnaMesta < dogadjaj.MaksimalanKapacitet)
                         {
                             dogadjaj.SlobodnaMesta++;
@@ -118,7 +118,7 @@ namespace Events.API.HostedServices
                 }
             });
 
-            // Služi da pozadinska nit ostane aktivna
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(1000, stoppingToken);
