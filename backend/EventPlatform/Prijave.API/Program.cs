@@ -25,7 +25,15 @@ namespace Prijave.API
             builder.Services.AddScoped<EmailPublisher>();
             builder.Services.AddHostedService<EmailRateLimiterConsumer>();
             builder.Services.AddHostedService<Prijave.API.Services.Dispatcher>();
-            builder.Services.AddHostedService<SagaCommandConsumer>();
+            string sagaPattern = builder.Configuration["SagaPattern"] ?? "Orchestration";
+            if (sagaPattern.Equals("Choreography", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Services.AddHostedService<SagaChoreographyConsumer>();
+            }
+            else
+            {
+                builder.Services.AddHostedService<SagaCommandConsumer>();
+            }
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
