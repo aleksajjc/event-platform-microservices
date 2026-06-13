@@ -9,6 +9,7 @@ namespace DTO.RabbitMq.Messages
     public class OdbijenaKotizacija
     {
         public Guid CorrelationID { get; set; }
+        public int StrucniDogadjajID { get; set; }
         public string Razlog { get; set; }
     }
 }
