@@ -10,20 +10,27 @@ namespace Placanja.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Dodajemo SQL Server bazu podataka za plaćanje
+            
             builder.Services.AddSqlServer<PlacanjaContext>(builder.Configuration.GetConnectionString("DefaultConnectionPlacanja"));
 
-            // Dodajemo standardne API servise
+            
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Registrujemo Saga potrošač komandi za plaćanje kao pozadinski servis
-            builder.Services.AddHostedService<SagaCommandConsumer>();
+            string sagaPattern = builder.Configuration["SagaPattern"] ?? "Orchestration";
+            if (sagaPattern.Equals("Choreography", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Services.AddHostedService<SagaChoreographyConsumer>();
+            }
+            else
+            {
+                builder.Services.AddHostedService<SagaCommandConsumer>();
+            }
 
             var app = builder.Build();
 
-            // Konfiguracija HTTP zahteva za razvojno okruženje
+            
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -33,7 +40,7 @@ namespace Placanja.API
             app.UseAuthorization();
             app.MapControllers();
 
-            // Osiguravamo da baza i seedovani podaci za plaćanja postoje na mašini
+            
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<PlacanjaContext>();
