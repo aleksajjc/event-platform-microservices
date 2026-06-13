@@ -24,9 +24,17 @@ namespace Events.API
 
             builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
             builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
-            //builder.Services.AddHostedService<DogadjajOutboxPublisher>();
+            builder.Services.AddHostedService<DogadjajOutboxPublisher>();
             builder.Services.AddHostedService<DogadjajDetaljiProcessorService>();
-            builder.Services.AddHostedService<Events.API.HostedServices.SagaCommandConsumer>();
+            string sagaPattern = builder.Configuration["SagaPattern"] ?? "Orchestration";
+            if (sagaPattern.Equals("Choreography", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Services.AddHostedService<SagaChoreographyConsumer>();
+            }
+            else
+            {
+                builder.Services.AddHostedService<Events.API.HostedServices.SagaCommandConsumer>();
+            }
 
             builder.Services.AddMediatR(cfg =>
             {
