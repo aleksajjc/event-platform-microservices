@@ -1,5 +1,6 @@
 using EventPlatform.Data;
 using EventPlatform.Patterns;
+using System.Net.Http.Headers;
 
 namespace EventPlatform
 {
@@ -17,6 +18,7 @@ namespace EventPlatform
                 client.Timeout = TimeSpan.FromSeconds(10);
                 client.DefaultRequestHeaders.Add("X-Request-Source", "MVC-Frontend");
                 client.DefaultRequestHeaders.Add("X-Client-Id", "MVC-Client");
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("EventPlatformMVC", "1.0"));
                 client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("EventsAPIEndPoint")!);
             });
 
@@ -25,6 +27,7 @@ namespace EventPlatform
                 client.Timeout = TimeSpan.FromSeconds(10);
                 client.DefaultRequestHeaders.Add("X-Request-Source", "MVC-Frontend");
                 client.DefaultRequestHeaders.Add("X-Client-Id", "MVC-Client");
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("EventPlatformMVC", "1.0"));
                 client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("PrijaveAPIEndPoint")!);
             });
 
