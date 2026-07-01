@@ -1,0 +1,61 @@
+@model EventPlatform.Models.RacunUcesnikaViewModel
+
+@{
+    ViewData["Title"] = "Detalji računa";
+}
+
+<div class="container mt-5">
+    <h2>Detalji Računa</h2>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card p-4 mt-3">
+        <h4>Informacije</h4>
+        <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item"><strong>ID Učesnika:</strong> @Model.Id</li>
+            <li class="list-group-item"><strong>Ime i Prezime:</strong> @Model.Ime @Model.Prezime</li>
+            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+            <li class="list-group-item"><strong>Trenutno Stanje:</strong> <span class="badge bg-success fs-5">@Model.StanjeNaRacunu RSD</span></li>
+            <li class="list-group-item">
+                <strong>Status Računa:</strong> 
+                @if (Model.JeBlokiran)
+                {
+                    <span class="badge bg-danger">Blokiran</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Aktivna</span>
+                }
+            </li>
+        </ul>
+
+        <h4>Akcije nad računom</h4>
+        <div class="d-flex gap-2 mt-2">
+            <a asp-action="Deposit" asp-route-id="@Model.Id" class="btn btn-outline-success">Uplati sredstva</a>
+            <a asp-action="Withdraw" asp-route-id="@Model.Id" class="btn btn-outline-warning">Isplati sredstva</a>
+            
+            @if (Model.JeBlokiran)
+            {
+                <form asp-action="Unblock" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-outline-info">Odblokiraj račun</button>
+                </form>
+            }
+            else
+            {
+                <a asp-action="Block" asp-route-id="@Model.Id" class="btn btn-outline-danger">Blokiraj račun</a>
+            }
+            
+            <a asp-action="History" asp-route-id="@Model.Id" class="btn btn-dark ms-auto">Pogledaj istoriju (Event Stream)</a>
+        </div>
+    </div>
+    
+    <a asp-action="Index" class="btn btn-secondary mt-3">Nazad</a>
+</div>

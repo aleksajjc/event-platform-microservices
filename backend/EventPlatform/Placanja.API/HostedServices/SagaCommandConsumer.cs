@@ -20,7 +20,7 @@ namespace Placanja.API.HostedServices
         {
             using var bus = new RabbitMqBus();
 
-            // Slušamo komandu za naplatu
+            
             await bus.Subscribe<NaplatiKotizaciju>("naplati-kotizaciju", async (cmd) =>
             {
                 Console.WriteLine($"[PLACANJA-SAGA] Primljena komanda NaplatiKotizaciju za CorrelationId: {cmd.CorrelationID}, UcesnikID: {cmd.UcesnikID}, Iznos: {cmd.Iznos}");
@@ -84,7 +84,7 @@ namespace Placanja.API.HostedServices
                 }
             });
 
-            // Slušamo komandu za kompenzaciju (povraćaj novca)
+            
             await bus.Subscribe<VratiNovac>("vrati-novac", async (cmd) =>
             {
                 Console.WriteLine($"[PLACANJA-SAGA] Primljena kompenzaciona komanda VratiNovac za CorrelationId: {cmd.CorrelationID}, UcesnikID: {cmd.UcesnikID}, Iznos: {cmd.Iznos}");
@@ -114,7 +114,7 @@ namespace Placanja.API.HostedServices
                 }
             });
 
-            // Služi da pozadinska nit ostane aktivna
+            
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(1000, stoppingToken);

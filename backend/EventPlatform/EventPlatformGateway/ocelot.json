@@ -4,10 +4,13 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Dogadjaji",
       "DownstreamPathTemplate": "/Dogadjaji",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "CacheOptions": { "TtlSeconds": 60 },
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
+      "UpstreamHeaderTransform": {
+        "X-Powered-By-Gateway": "Ocelot-EventPlatform"
+      },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
       }
@@ -16,8 +19,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Dogadjaji/{everything}",
       "DownstreamPathTemplate": "/Dogadjaji/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "CacheOptions": { "TtlSeconds": 60 },
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
@@ -28,8 +31,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Lokacije",
       "DownstreamPathTemplate": "/Lokacije",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -39,8 +42,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Lokacije/{everything}",
       "DownstreamPathTemplate": "/Lokacije/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -50,8 +53,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Predavaci",
       "DownstreamPathTemplate": "/Predavaci",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -61,8 +64,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Predavaci/{everything}",
       "DownstreamPathTemplate": "/Predavaci/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -72,8 +75,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/TipoviDogadjaja",
       "DownstreamPathTemplate": "/TipoviDogadjaja",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -83,8 +86,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/TipoviDogadjaja/{everything}",
       "DownstreamPathTemplate": "/TipoviDogadjaja/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7017 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5057 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -94,8 +97,8 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Prijave",
       "DownstreamPathTemplate": "/Prijave",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7276 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5181 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -105,8 +108,30 @@
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
       "UpstreamPathTemplate": "/Prijave/{everything}",
       "DownstreamPathTemplate": "/Prijave/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 7276 } ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5181 } ],
+      "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
+      "HttpHandlerOptions": {
+        "DangerousAcceptAnyServerCertificateValidator": true
+      }
+    },
+    {
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "UpstreamPathTemplate": "/RacuniEventSourcing",
+      "DownstreamPathTemplate": "/RacuniEventSourcing",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5170 } ],
+      "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
+      "HttpHandlerOptions": {
+        "DangerousAcceptAnyServerCertificateValidator": true
+      }
+    },
+    {
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
+      "UpstreamPathTemplate": "/RacuniEventSourcing/{everything}",
+      "DownstreamPathTemplate": "/RacuniEventSourcing/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "localhost", "Port": 5170 } ],
       "RateLimitOptions": { "EnableRateLimiting": true, "Period": "30s", "PeriodTimespan": 30, "Limit": 10 },
       "HttpHandlerOptions": {
         "DangerousAcceptAnyServerCertificateValidator": true
@@ -117,7 +142,7 @@
     "BaseUrl": "https://localhost:7253",
     "RateLimitOptions": {
       "RouteKeys": [],
-      "ClientIdHeader": "X-Client-Id",
+      "ClientIdHeader": "User-Agent",
       "Limit": 10,
       "Period": "30s",
       "Wait": "1m",

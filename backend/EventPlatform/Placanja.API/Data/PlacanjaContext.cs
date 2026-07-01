@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Placanja.API.Models;
+using Placanja.API.Models.EventSourcing;
 
 namespace Placanja.API.Data
 {
@@ -10,6 +11,8 @@ namespace Placanja.API.Data
         }
 
         public DbSet<RacunUcesnika> RacuniUcesnika { get; set; }
+        public DbSet<EventStoreRecord> EventStoreRecords { get; set; }
+        public DbSet<SnapshotStoreRecord> SnapshotStoreRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

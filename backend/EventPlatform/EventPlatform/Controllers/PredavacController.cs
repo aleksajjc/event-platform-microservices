@@ -47,7 +47,6 @@ namespace EventPlatform.Controllers
         }
         public async Task<IActionResult> Index()
         {
-
             var client = _httpClientFactory.CreateClient("EventsAPI");
 
             var predavaci = await client.GetFromJsonAsync<List<PredavacDTO>>("/Predavaci");

@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Event Sourcing Dashboard";
+}
+
+<div class="container mt-5">
+    <h2>Event Sourcing - Računi učesnika</h2>
+    <hr />
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h4>Pronađi račun</h4>
+                <form asp-action="Lookup" method="post" class="mt-3">
+                    <div class="form-group">
+                        <label>ID Učesnika</label>
+                        <input type="number" name="id" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Pretraga</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h4>Novi račun</h4>
+                <p>Ukoliko korisnik nema račun, možete ga kreirati.</p>
+                <a asp-action="Create" class="btn btn-success mt-2">Kreiraj novi račun</a>
+            </div>
+        </div>
+    </div>
+</div>

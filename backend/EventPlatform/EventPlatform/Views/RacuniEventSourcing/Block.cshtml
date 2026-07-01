@@ -1,0 +1,29 @@
+@model EventPlatform.Models.BlockRacunViewModel
+
+@{
+    ViewData["Title"] = "Blokada računa";
+}
+
+<div class="container mt-5">
+    <h2>Blokada računa #@Model.UcesnikID</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Block" method="post">
+                <input type="hidden" asp-for="UcesnikID" />
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Razlog" class="control-label"></label>
+                    <textarea asp-for="Razlog" class="form-control" rows="3" required></textarea>
+                    <span asp-validation-for="Razlog" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-danger">Blokiraj račun</button>
+                    <a asp-action="Details" asp-route-id="@Model.UcesnikID" class="btn btn-secondary ms-2">Odustani</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

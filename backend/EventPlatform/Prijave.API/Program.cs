@@ -43,8 +43,6 @@ namespace Prijave.API
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseAuthorization();
 
 

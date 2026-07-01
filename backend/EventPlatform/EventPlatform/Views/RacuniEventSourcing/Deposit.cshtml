@@ -1,0 +1,29 @@
+@model EventPlatform.Models.AmountRacunViewModel
+
+@{
+    ViewData["Title"] = "Uplata sredstava";
+}
+
+<div class="container mt-5">
+    <h2>Uplata na račun #@Model.UcesnikID</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Deposit" method="post">
+                <input type="hidden" asp-for="UcesnikID" />
+                
+                <div class="form-group mb-3">
+                    <label asp-for="Iznos" class="control-label"></label>
+                    <input asp-for="Iznos" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="Iznos" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success">Uplati</button>
+                    <a asp-action="Details" asp-route-id="@Model.UcesnikID" class="btn btn-secondary ms-2">Odustani</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Placanja.API.Data;
 
@@ -11,9 +12,11 @@ using Placanja.API.Data;
 namespace Placanja.API.Migrations
 {
     [DbContext(typeof(PlacanjaContext))]
-    partial class PlacanjaContextModelSnapshot : ModelSnapshot
+    [Migration("20260614073521_AddEventSourcing")]
+    partial class AddEventSourcing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

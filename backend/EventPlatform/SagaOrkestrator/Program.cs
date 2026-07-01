@@ -7,6 +7,7 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace SagaOrkestrator
 {
@@ -14,6 +15,22 @@ namespace SagaOrkestrator
     {
         static async Task Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .Build();
+
+            string sagaPattern = configuration["SagaPattern"] ?? "Orchestration";
+            if (sagaPattern.Equals("Choreography", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.Title = "- SAGA CHOREOGRAPHY -";
+                Console.WriteLine("[SAGA] Orkestrator je DEAKTIVIRAN jer je aktivna Saga Koreografija.");
+                while (true)
+                {
+                    await Task.Delay(1000);
+                }
+            }
+
             Console.Title = "- SAGA ORKESTRATOR CONSOLE -";
             Console.WriteLine("[SAGA] Pokretanje Saga Orkestratora...");
 

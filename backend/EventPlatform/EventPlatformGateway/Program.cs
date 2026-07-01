@@ -1,5 +1,3 @@
-
-using EventPlatformGateway.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
@@ -62,9 +60,19 @@ namespace EventPlatformGateway
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseMiddleware<RequestSecurityMiddleware>();
+            // --- DEO ZA ODBRANU PROJEKTA: LOGGING & MONITORING ---
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine("==========================================================");
+                Console.WriteLine($"[LOG & MONITORING] NOVI ZAHTEV PRISTIGAO NA GATEWAY!");
+                Console.WriteLine($"[LOG] Vreme: {DateTime.Now}");
+                Console.WriteLine($"[LOG] Metoda: {context.Request.Method}");
+                Console.WriteLine($"[LOG] Putanja: {context.Request.Path}");
+                Console.WriteLine("==========================================================");
+                
+                await next.Invoke();
+            });
+            // -----------------------------------------------------
 
             app.UseAuthentication();
 

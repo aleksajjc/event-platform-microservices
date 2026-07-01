@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Placanja.API.Data;
 using Placanja.API.HostedServices;
+using Placanja.API.Services;
 
 namespace Placanja.API
 {
@@ -16,7 +17,10 @@ namespace Placanja.API
             
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+            builder.Services.AddScoped<EventStoreRepository>();
 
             string sagaPattern = builder.Configuration["SagaPattern"] ?? "Orchestration";
             if (sagaPattern.Equals("Choreography", StringComparison.OrdinalIgnoreCase))

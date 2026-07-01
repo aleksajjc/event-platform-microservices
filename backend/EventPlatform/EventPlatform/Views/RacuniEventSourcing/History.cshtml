@@ -1,0 +1,44 @@
+@using System.Text.Json
+@model List<EventPlatform.Models.EventHistoryViewModel>
+
+@{
+    ViewData["Title"] = "Istorija računa";
+}
+
+<div class="container mt-5">
+    <h2>Istorija Računa #@ViewBag.UcesnikID (Event Stream)</h2>
+    <hr />
+    
+    <div class="mb-3">
+        <a asp-action="Details" asp-route-id="@ViewBag.UcesnikID" class="btn btn-secondary">Nazad na Detalje</a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-bordered mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>R.B.</th>
+                    <th>Vreme događaja</th>
+                    <th>Tip događaja</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int counter = 1; }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@counter</td>
+                        <td>@item.OccurredOn.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                        <td><span class="badge bg-primary">@item.EventType</span></td>   
+                    </tr>
+                    counter++;
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">Nema istorije za ovaj račun.</div>
+    }
+</div>
