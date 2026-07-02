@@ -41,7 +41,7 @@ namespace Placanja.API.Services
                 _context.EventStoreRecords.Add(record);
             }
 
-            // Create a snapshot every 5 versions for optimization
+            
             if (aggregate.Version % 5 == 0)
             {
                 var snapshot = aggregate.CreateSnapshot();
@@ -75,12 +75,7 @@ namespace Placanja.API.Services
 
             if (latestSnapshot != null)
             {
-                // In a real scenario we'd persist the type of snapshot in the DB, 
-                // but since we only have one aggregate, we know it's RacunUcesnikaSnapshot.
-                // We'll deserialize to AggregateSnapshot which needs casting in RestoreSnapshot
-                // but since the concrete type is needed:
                 
-                // Find snapshot concrete type via aggregate
                 var dummySnapshot = aggregate.CreateSnapshot();
                 var snapshotObj = JsonSerializer.Deserialize(latestSnapshot.SnapshotData, dummySnapshot.GetType()) as AggregateSnapshot;
                 

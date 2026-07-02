@@ -60,7 +60,7 @@ namespace EventPlatformGateway
                 app.UseSwaggerUI();
             }
 
-            // --- DEO ZA ODBRANU PROJEKTA: LOGGING & MONITORING ---
+            
             app.Use(async (context, next) =>
             {
                 Console.WriteLine("==========================================================");
